@@ -1,36 +1,43 @@
 #ifndef DA2324_PRJ1_G17_4_MENU_H
 #define DA2324_PRJ1_G17_4_MENU_H
 
+#include "Manager.h"
+
 #include <iostream>
 
 class Menu {
 public:
     /**
-     * @brief Menu (maybe to choose which dataset to use)
-     * Complexity: O()
+     * @brief Constructor for the Menu class.
      */
     Menu();
+
     /**
-     * @brief Main Menu
-     * Complexity: O()
+     * @brief Displays the Main Menu options.
+     * @complexity O()
      */
     void mainMenu();
+
     /**
-     * @brief Basic Service Metrics
-     * Complexity: O()
+     * @brief Displays Basic Service Metrics.
+     * @complexity O()
      */
     void basicServiceMetrics();
+
     /**
-     * @brief Reliability And Sensitivity
-     * Complexity: O()
+     * @brief Displays Reliability And Sensitivity.
+     * @complexity O()
      */
     void reliabilityAndSensitivity();
+
     /**
      * @brief Allows choose between each or a specific city to
      * determine the maximum amount of water than can reach
-     * Complexity: O()
+     * @complexity O()
      */
     void chooseEachSpecificCity();
+private:
+    Manager network;
 };
 
 

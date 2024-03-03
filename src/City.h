@@ -6,15 +6,53 @@
 class City: public Station {
 private:
     string city;
-    unsigned int demand;
+    double demand;
     unsigned int population;
 public:
-    City(int id, string code, string city, unsigned int demand, unsigned int population);
+    /**
+     * @brief Constructor for the City class.
+     * @param id
+     * @param code
+     * @param city
+     * @param demand
+     * @param population
+     */
+    City(int id, string code, string city, double demand, unsigned int population);
+
+    /**
+     *
+     * @return
+     */
     string getCity() const;
+
+    /**
+     *
+     * @param city
+     */
     void setCity(string city);
+
+    /**
+     *
+     * @return
+     */
     unsigned int getDemand() const;
+
+    /**
+     *
+     * @param demand
+     */
     void setDemand(unsigned int demand);
+
+    /**
+     *
+     * @return
+     */
     unsigned int getPopulation() const;
+
+    /**
+     *
+     * @param population
+     */
     void setPopulation(unsigned int population);
 };
 

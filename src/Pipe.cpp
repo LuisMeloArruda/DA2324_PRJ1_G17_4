@@ -38,3 +38,7 @@ bool Pipe::getDirection() const {
 void Pipe::setDirection(bool direction) {
     this->direction = direction;
 }
+
+bool Pipe::operator==(const Pipe &secondPipe) const {
+    return servicePointA == secondPipe.getServicePointA() && servicePointB == secondPipe.getServicePointB();
+}

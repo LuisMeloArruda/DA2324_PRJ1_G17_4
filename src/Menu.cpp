@@ -132,5 +132,7 @@ void Menu::reliabilityAndSensitivity() {
 
 Menu::Menu() {
     // se calhar isto dá jeito para dps escolhermos qual dataset queremos usar (o mais pequeno ou o maior)
+    network = Manager();
+    network.readCSVs();
     mainMenu();
 }

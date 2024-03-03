@@ -1,6 +1,6 @@
 #include "City.h"
 
-City::City(int id, string code, string city, unsigned int demand, unsigned int population): Station(id, code) {
+City::City(int id, string code, string city, double demand, unsigned int population): Station(id, code) {
     this->city = city;
     this->demand = demand;
     this->population = population;
