@@ -13,4 +13,6 @@ add_executable(DA2324_PRJ1_G17_4
         src/Station.h
         src/Station.cpp
         src/Reservoir.h
-        src/Reservoir.cpp)
+        src/Reservoir.cpp
+        src/City.cpp
+        src/City.h)
