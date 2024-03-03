@@ -21,6 +21,6 @@ Station::Station(int id, string code) {
     this->code = code;
 }
 
-bool Station::operator==(const string &secondCode) {
-    return code==secondCode;
+bool Station::operator==(const Station &secondStation) const{
+    return code==secondStation.code;
 }

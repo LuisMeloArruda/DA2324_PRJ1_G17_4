@@ -355,7 +355,7 @@ std::vector<Vertex<T> *> Graph<T>::getVertexSet() const {
 template <class T>
 Vertex<T> * Graph<T>::findVertex(const T &in) const {
     for (auto v : vertexSet)
-        if (v->getInfo() == in)
+        if (static_cast<const Station>(static_cast<const Station>(v->getInfo())) == in)
             return v;
     return nullptr;
 }
@@ -586,7 +586,6 @@ bool Graph<T>::dfsIsDAG(Vertex<T> *v) const {
 //=============================================================================
 // Exercise 1: Topological Sorting
 //=============================================================================
-// TODO
 /*
  * Performs a topological sorting of the vertices of a graph (this).
  * Returns a vector with the contents of the vertices by topological order.

@@ -1,7 +1,3 @@
-//
-// Created by g3ral on 03/03/2024.
-//
-
 #ifndef DA2324_PRJ1_G17_4_STATION_H
 #define DA2324_PRJ1_G17_4_STATION_H
 
@@ -19,7 +15,7 @@ public:
     void setId(int Id);
     string getCode() const;
     void setCode(string code);
-    bool operator==(const string &secondCode);
+    bool operator==(const Station &secondStation) const;
 };
 
 #endif //DA2324_PRJ1_G17_4_STATION_H
