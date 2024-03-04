@@ -96,46 +96,72 @@ template <class T>
 class Graph {
 public:
     ~Graph();
-    /*
-    * Auxiliary function to find a vertex with a given the content.
-    */
     Vertex<T> *findVertex(const T &in) const;
-    /*
-     *  Adds a vertex with a given content or info (in) to a graph (this).
-     *  Returns true if successful, and false if a vertex with that content already exists.
-     */
     bool addVertex(const T &in);
     bool removeVertex(const T &in);
-
-    /*
-     * Adds an edge to a graph (this), given the contents of the source and
-     * destination vertices and the edge weight (w).
-     * Returns true if successful, and false if the source or destination vertex does not exist.
-     */
     bool addEdge(const T &sourc, const T &dest, double w);
     bool removeEdge(const T &source, const T &dest);
     bool addBidirectionalEdge(const T &sourc, const T &dest, double w);
-
     int getNumVertex() const;
     std::vector<Vertex<T> *> getVertexSet() const;
-
     std:: vector<T> dfs() const;
     std:: vector<T> dfs(const T & source) const;
     void dfsVisit(Vertex<T> *v,  std::vector<T> & res) const;
     std::vector<T> bfs(const T & source) const;
-
     bool isDAG() const;
     bool dfsIsDAG(Vertex<T> *v) const;
     std::vector<T> topsort() const;
+
+    /**
+     * @brief Runs an Edmonds-Karp algorithm to determine the maximum flow from the source node to the destination node.
+     * @param source Source info.
+     * @param target Destination info.
+     * @return Maximum flow from source to destination.
+     * @complexity O()
+     */
+    int edmondsKarp(T &source, T &target);
+
+    /**
+     * @brief Augments the flow along the augmenting path from the source vertex to the destination vertex.
+     * @param s source Source vertex.
+     * @param t dest Destination vertex.
+     * @param f Minimum flow from source to destination.
+     * @complexity O()
+     */
+    void augmentFlowAlongPath(Vertex<T> *s, Vertex<T> *t, double f);
+
+    /**
+     * @brief Finds the minimum residual capacity along the augmenting path from the source vertex to the destination vertex.
+     * @param s source Source vertex.
+     * @param t dest Destination vertex.
+     * @return Minimum flow between the source and target.
+     * @complexity O()
+     */
+    double findMinResidualAlongPath(Vertex<T> *s, Vertex<T> *t);
+
+    /**
+     * @brief Finds an augmenting path using Breadth-First Search from the source vertex to the destination vertex.
+     * @param s source Source vertex.
+     * @param t dest Destination vertex.
+     * @return True if an augmenting path is found, false otherwise.
+     * @complexity O()
+     */
+    bool findAugmentingPath(Vertex<T> *s, Vertex<T> *t);
+
+    /**
+     * @brief Tests and visits a vertex if conditions are met, adding it to the queue.
+     * @param q Reference to the queue used for BFS traversal.
+     * @param e Pointer to the edge being processed.
+     * @param w Pointer to the vertex to be tested and visited.
+     * @param residual Residual capacity of the edge.
+     * @complexity O()
+     */
+    void testAndVisit(std::queue< Vertex<T>*> &q, Edge<T> *e, Vertex<T> *w, double residual);
 protected:
     std::vector<Vertex<T> *> vertexSet;    // vertex set
-
     double ** distMatrix = nullptr;   // dist matrix for Floyd-Warshall
     int **pathMatrix = nullptr;   // path matrix for Floyd-Warshall
 
-    /*
-     * Finds the index of the vertex with a given content.
-     */
     int findVertexIdx(const T &in) const;
 };
 
@@ -147,10 +173,7 @@ void deleteMatrix(double **m, int n);
 
 template <class T>
 Vertex<T>::Vertex(T in): info(in) {}
-/*
- * Auxiliary function to add an outgoing edge to a vertex (this),
- * with a given destination vertex (d) and edge weight (w).
- */
+
 template <class T>
 Edge<T> * Vertex<T>::addEdge(Vertex<T> *d, double w) {
     auto newEdge = new Edge<T>(this, d, w);
@@ -159,11 +182,6 @@ Edge<T> * Vertex<T>::addEdge(Vertex<T> *d, double w) {
     return newEdge;
 }
 
-/*
- * Auxiliary function to remove an outgoing edge (with a given destination (d))
- * from a vertex (this).
- * Returns true if successful, and false if such edge does not exist.
- */
 template <class T>
 bool Vertex<T>::removeEdge(T in) {
     bool removedEdge = false;
@@ -183,9 +201,6 @@ bool Vertex<T>::removeEdge(T in) {
     return removedEdge;
 }
 
-/*
- * Auxiliary function to remove an outgoing edge of a vertex.
- */
 template <class T>
 void Vertex<T>::removeOutgoingEdges() {
     auto it = adj.begin();
@@ -349,20 +364,14 @@ std::vector<Vertex<T> *> Graph<T>::getVertexSet() const {
     return vertexSet;
 }
 
-/*
- * Auxiliary function to find a vertex with a given content.
- */
 template <class T>
 Vertex<T> * Graph<T>::findVertex(const T &in) const {
     for (auto v : vertexSet)
-        if (static_cast<const Station>(static_cast<const Station>(v->getInfo())) == in)
+        if (v->getInfo() == in)
             return v;
     return nullptr;
 }
 
-/*
- * Finds the index of the vertex with a given content.
- */
 template <class T>
 int Graph<T>::findVertexIdx(const T &in) const {
     for (unsigned i = 0; i < vertexSet.size(); i++)
@@ -370,10 +379,7 @@ int Graph<T>::findVertexIdx(const T &in) const {
             return i;
     return -1;
 }
-/*
- *  Adds a vertex with a given content or info (in) to a graph (this).
- *  Returns true if successful, and false if a vertex with that content already exists.
- */
+
 template <class T>
 bool Graph<T>::addVertex(const T &in) {
     if (findVertex(in) != nullptr)
@@ -382,11 +388,6 @@ bool Graph<T>::addVertex(const T &in) {
     return true;
 }
 
-/*
- *  Removes a vertex with a given content (in) from a graph (this), and
- *  all outgoing and incoming edges.
- *  Returns true if successful, and false if such vertex does not exist.
- */
 template <class T>
 bool Graph<T>::removeVertex(const T &in) {
     for (auto it = vertexSet.begin(); it != vertexSet.end(); it++) {
@@ -404,11 +405,6 @@ bool Graph<T>::removeVertex(const T &in) {
     return false;
 }
 
-/*
- * Adds an edge to a graph (this), given the contents of the source and
- * destination vertices and the edge weight (w).
- * Returns true if successful, and false if the source or destination vertex does not exist.
- */
 template <class T>
 bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
     auto v1 = findVertex(sourc);
@@ -419,11 +415,6 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
     return true;
 }
 
-/*
- * Removes an edge from a graph (this).
- * The edge is identified by the source (sourc) and destination (dest) contents.
- * Returns true if successful, and false if such edge does not exist.
- */
 template <class T>
 bool Graph<T>::removeEdge(const T &sourc, const T &dest) {
     Vertex<T> * srcVertex = findVertex(sourc);
@@ -448,10 +439,6 @@ bool Graph<T>::addBidirectionalEdge(const T &sourc, const T &dest, double w) {
 
 /****************** DFS ********************/
 
-/*
- * Performs a depth-first search (dfs) traversal in a graph (this).
- * Returns a vector with the contents of the vertices by dfs order.
- */
 template <class T>
 std::vector<T> Graph<T>::dfs() const {
     std::vector<T> res;
@@ -463,10 +450,6 @@ std::vector<T> Graph<T>::dfs() const {
     return res;
 }
 
-/*
- * Performs a depth-first search (dfs) in a graph (this) from the source node.
- * Returns a vector with the contents of the vertices by dfs order.
- */
 template <class T>
 std::vector<T> Graph<T>::dfs(const T & source) const {
     std::vector<int> res;
@@ -485,10 +468,6 @@ std::vector<T> Graph<T>::dfs(const T & source) const {
     return res;
 }
 
-/*
- * Auxiliary function that visits a vertex (v) and its adjacent, recursively.
- * Updates a parameter with the list of visited node contents.
- */
 template <class T>
 void Graph<T>::dfsVisit(Vertex<T> *v, std::vector<T> & res) const {
     v->setVisited(true);
@@ -502,11 +481,7 @@ void Graph<T>::dfsVisit(Vertex<T> *v, std::vector<T> & res) const {
 }
 
 /****************** BFS ********************/
-/*
- * Performs a breadth-first search (bfs) in a graph (this), starting
- * from the vertex with the given source contents (source).
- * Returns a vector with the contents of the vertices by bfs order.
- */
+
 template <class T>
 std::vector<T> Graph<T>::bfs(const T & source) const {
     std::vector<int> res;
@@ -540,15 +515,6 @@ std::vector<T> Graph<T>::bfs(const T & source) const {
     return res;
 }
 
-/****************** isDAG  ********************/
-/*
- * Performs a depth-first search in a graph (this), to determine if the graph
- * is acyclic (acyclic directed graph or DAG).
- * During the search, a cycle is found if an edge connects to a vertex
- * that is being processed in the stack of recursive calls (see theoretical classes).
- * Returns true if the graph is acyclic, and false otherwise.
- */
-
 template <class T>
 bool Graph<T>::isDAG() const {
     for (auto v : vertexSet) {
@@ -563,10 +529,6 @@ bool Graph<T>::isDAG() const {
     return true;
 }
 
-/**
- * Auxiliary function that visits a vertex (v) and its adjacent, recursively.
- * Returns false (not acyclic) if an edge to a vertex in the stack is found.
- */
 template <class T>
 bool Graph<T>::dfsIsDAG(Vertex<T> *v) const {
     v->setVisited(true);
@@ -583,15 +545,6 @@ bool Graph<T>::dfsIsDAG(Vertex<T> *v) const {
 }
 
 /****************** toposort ********************/
-//=============================================================================
-// Exercise 1: Topological Sorting
-//=============================================================================
-/*
- * Performs a topological sorting of the vertices of a graph (this).
- * Returns a vector with the contents of the vertices by topological order.
- * If the graph has cycles, returns an empty vector.
- * Follows the algorithm described in theoretical classes.
- */
 
 template<class T>
 std::vector<T> Graph<T>::topsort() const {
@@ -658,6 +611,114 @@ template <class T>
 Graph<T>::~Graph() {
     deleteMatrix(distMatrix, vertexSet.size());
     deleteMatrix(pathMatrix, vertexSet.size());
+}
+
+// Algoritmos implementados
+
+// Function to test the given vertex 'w' and visit it if conditions are met
+template <class T>
+void Graph<T>::testAndVisit(std::queue< Vertex<T>*> &q, Edge<T> *e, Vertex<T> *w, double residual) {
+    // Check if the vertex 'w' is not visited and there is residual capacity
+    if (! w->isVisited() && residual > 0) {
+        // Mark 'w' as visited, set the path through which it was reached, and enqueue it
+        w->setVisited(true);
+        w->setPath(e);
+        q.push(w);
+    }
+}
+// Function to find an augmenting path using Breadth-First Search
+template <class T>
+bool Graph<T>::findAugmentingPath(Vertex<T> *s, Vertex<T> *t) {
+    // Mark all vertices as not visited
+    for(auto v : getVertexSet()) {
+        v->setVisited(false);
+    }
+    // Mark the source vertex as visited and enqueue it
+    s->setVisited(true);
+    std::queue<Vertex<T> *> q;
+    q.push(s);
+    // BFS to find an augmenting path
+    while( ! q.empty() && ! t->isVisited()) {
+        auto v = q.front();
+        q.pop();
+        // Process outgoing edges
+        for(auto e: v->getAdj()) {
+            testAndVisit(q, e, e->getDest(), e->getWeight() - e->getFlow());
+        }
+        // Process incoming edges
+        for(auto e: v->getIncoming()) {
+            testAndVisit(q, e, e->getOrig(), e->getFlow());
+        }
+    }
+    // Return true if a path to the target is found, false otherwise
+    return t->isVisited();
+}
+
+// Function to find the minimum residual capacity along the augmenting path
+template <class T>
+double Graph<T>::findMinResidualAlongPath(Vertex<T> *s, Vertex<T> *t) {
+    double f = INF;
+    // Traverse the augmenting path to find the minimum residual capacity
+    for (auto v = t; v != s; ) {
+        auto e = v->getPath();
+        if (e->getDest() == v) {
+            f = std::min(f, e->getWeight() - e->getFlow());
+            v = e->getOrig();
+        }
+        else {
+            f = std::min(f, e->getFlow());
+            v = e->getDest();
+        }
+    }
+    // Return the minimum residual capacity
+    return f;
+}
+
+// Function to augment flow along the augmenting path with the given flow value
+template <class T>
+void Graph<T>:: augmentFlowAlongPath(Vertex<T> *s, Vertex<T> *t, double f) {
+    // Traverse the augmenting path and update the flow values accordingly
+    for (auto v = t; v != s; ) {
+        auto e = v->getPath();
+        double flow = e->getFlow();
+        if (e->getDest() == v) {
+            e->setFlow(flow + f);
+            v = e->getOrig();
+        }
+        else {
+            e->setFlow(flow - f);
+            v = e->getDest();
+        }
+    }
+}
+
+// Main function implementing the Edmonds-Karp algorithm
+template <class T>
+int Graph<T>::edmondsKarp(T &source, T &target) {
+    double res = 0;
+    // Find source and target vertices in the graph
+    Vertex<T>* s = findVertex(source);
+    Vertex<T>* t = findVertex(target);
+    // Validate source and target vertices
+    if (s == nullptr || t == nullptr || s == t)
+        throw std::logic_error("Invalid source and/or target vertex");
+    // Initialize flow on all edges to 0
+    for (auto v : getVertexSet()) {
+        for (auto e: v->getAdj()) {
+            e->setFlow(0);
+        }
+    }// While there is an augmenting path, augment the flow along the path
+    while (findAugmentingPath(s, t) ) {
+        double f = findMinResidualAlongPath(s, t);
+        res += f;
+        augmentFlowAlongPath(s, t, f);
+    }
+    if
+    (res == 0) {
+        return -1; // no water found
+    } else {
+        return res;
+    }
 }
 
 #endif //DA2324_PRJ1_G17_4_GRAPH_H

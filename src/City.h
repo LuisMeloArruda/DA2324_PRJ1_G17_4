@@ -11,47 +11,47 @@ private:
 public:
     /**
      * @brief Constructor for the City class.
-     * @param id
-     * @param code
-     * @param city
-     * @param demand
-     * @param population
+     * @param id The ID of the city.
+     * @param code The code of the city.
+     * @param city The name of the city.
+     * @param demand The demand of the city.
+     * @param population The population of the city.
      */
     City(int id, string code, string city, double demand, unsigned int population);
 
     /**
-     *
-     * @return
+     * @brief Gets the name of the city.
+     * @return The name of the city.
      */
     string getCity() const;
 
     /**
-     *
-     * @param city
+     * @brief Sets the name of the city.
+     * @param city The name of the city.
      */
     void setCity(string city);
 
     /**
-     *
-     * @return
+     * @brief Gets the demand of the city.
+     * @return The demand of the city.
      */
     unsigned int getDemand() const;
 
     /**
-     *
-     * @param demand
+     * @brief Sets the demand of the city.
+     * @param demand The demand of the city.
      */
     void setDemand(unsigned int demand);
 
     /**
-     *
-     * @return
+     * @brief Gets the population of the city.
+     * @return The population of the city.
      */
     unsigned int getPopulation() const;
 
     /**
-     *
-     * @param population
+     * @brief Sets the population of the city.
+     * @param population The population of the city.
      */
     void setPopulation(unsigned int population);
 };

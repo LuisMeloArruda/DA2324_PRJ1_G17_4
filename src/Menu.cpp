@@ -76,19 +76,19 @@ void Menu::chooseEachSpecificCity() {
                  "> ";
     int option;
     std::cin >> option;
+    std::string city;
     switch (option) {
         case 0:
             basicServiceMetrics();
             break;
         case 1:
-            // todo
-            basicServiceMetrics();
+            network.allCitiesMaximumFlow();
             break;
         case 2:
-            /*std::cout << "\nWhich city?"
+            std::cout << "\nWhich city?"
                          "> ";
-            std::string city;
-            std::cin >> city;*/
+            std::cin >> city;
+            network.maximumFlow(city);
             break;
         default:
             std::cout << "Invalid option.\n";
@@ -133,6 +133,6 @@ void Menu::reliabilityAndSensitivity() {
 Menu::Menu() {
     // se calhar isto dá jeito para dps escolhermos qual dataset queremos usar (o mais pequeno ou o maior)
     network = Manager();
-    network.readCSVs();
+    network.initializeGraph();
     mainMenu();
 }

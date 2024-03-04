@@ -24,7 +24,7 @@ public:
      * @brief Reads data from CSV files and initializes the network.
      * @complexity O()
      */
-    void readCSVs();
+    void initializeGraph();
 
     /**
      * @brief Reads reservoir data from a CSV file and populates the reservoirs map.
@@ -49,6 +49,23 @@ public:
      * @complexity O()
      */
     void readPipes();
+
+    /**
+     * @brief
+     * @complexity
+     */
+    void addArtificialSource();
+
+    /**
+     * @brief
+     * @param city
+     * @complexity
+     */
+    void maximumFlow(string city);
+    /**
+     * @brief prints the maximum flow that reaches all cities
+     */
+    void allCitiesMaximumFlow();
 };
 
 #endif //DA2324_PRJ1_G17_4_MANAGER_H

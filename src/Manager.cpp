@@ -1,10 +1,11 @@
 #include "Manager.h"
 
-void Manager::readCSVs() {
+void Manager::initializeGraph() {
     readReservoirs();
     readStations();
     readCities();
     readPipes();
+    addArtificialSource();
 }
 
 void Manager::readReservoirs() {
@@ -133,5 +134,31 @@ void Manager::readPipes() {
             if (!g.addBidirectionalEdge(Station(0, servicePointA), Station(0, servicePointB), capacity)) cout << "BIDIRECTION ERROR" << endl;
         }
         else if (!g.addEdge(Station(0, servicePointA), Station(0, servicePointB), capacity)) cout << "UNI ERROR" << endl;
+    }
+}
+
+void Manager::addArtificialSource() {
+    Station artificial = Station(0, "");
+    g.addVertex(artificial);
+    for (Vertex<Station>* v : g.getVertexSet()) {
+        if (v->getInfo().getCode()[0] == 'R') {
+            if (!g.addEdge(artificial, v->getInfo(), reservoirs.at(v->getInfo().getId()).getMaxDelivery())) cout << "ERROR IN ADDING SUPER SOURCE" << endl;
+        }
+    }
+}
+
+void Manager::maximumFlow(std::string city) {
+    Station source = Station(0, ""); // Artificial super source
+    Station target = Station(0, city);
+    int answer = g.edmondsKarp(source, target);
+    if (answer == -1) cout << "No water flows into: " << city << endl;
+    else cout << "<" << city << "," << answer << ">" << endl;
+}
+
+void Manager::allCitiesMaximumFlow() {
+    for (Vertex<Station>* v : g.getVertexSet()) {
+        if (v->getInfo().getCode()[0] == 'C') {
+            maximumFlow(v->getInfo().getCode());
+        }
     }
 }
