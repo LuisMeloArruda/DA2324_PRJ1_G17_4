@@ -344,11 +344,11 @@ void Manager::AffectedCitiesByPumping() {
         }
     }
 
-    int count = 0;
     for (Vertex<Station>* s: g.getVertexSet()) {
         if (s->getInfo().getCode()[0] != 'P') continue;
         vector<double> capacities = setZeroAndSaveCapacity(s);
         initiateEdmondsKarp();
+        int count = 0;
         for (Vertex<Station> *p : g.getVertexSet()) {
             if (p->getInfo().getCode()[0] != 'C') continue;
             if (p->getFlowRate() < originalValues[count]) {
