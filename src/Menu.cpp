@@ -114,7 +114,7 @@ void Menu::reliabilityAndSensitivity() {
                  "\n[0] Go back.\n"
                  "> ";
     int option;
-    string cityCode;
+    string cityCode, pumpingCode;
     std::cin >> option;
     switch (option) {
         case 0:
@@ -124,7 +124,7 @@ void Menu::reliabilityAndSensitivity() {
             // todo
             break;
         case 2:
-            // todo
+            network.AffectedCitiesByPumping();
             break;
         case 3:
             std::cin >> cityCode;

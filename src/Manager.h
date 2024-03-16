@@ -105,6 +105,10 @@ public:
 
     void AffectedCitiesByPipelines();
 
+    void AffectedCitiesByPumping();
+
+    vector<double> setZeroAndSaveCapacity(Vertex<Station>* v);
+
     /*Auxiliar*/
 
     /**
