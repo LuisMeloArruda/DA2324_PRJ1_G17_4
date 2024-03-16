@@ -11,6 +11,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 class Manager {
 private:
@@ -58,6 +59,12 @@ public:
 
     /**
      * @brief
+     * @return
+     */
+    void addArtificialSink();
+
+    /**
+     * @brief
      * @param city
      * @complexity
      */
@@ -66,6 +73,14 @@ public:
      * @brief prints the maximum flow that reaches all cities
      */
     void allCitiesMaximumFlow();
+
+    void allCitiesMaximumFlow2();
+
+    void reservoirDeficit();
+
+    void initialMetrics();
+
+    int calculatePipeFlow(string a, string b);
 };
 
 #endif //DA2324_PRJ1_G17_4_MANAGER_H

@@ -57,10 +57,10 @@ void Menu::basicServiceMetrics() {
             chooseEachSpecificCity();
             break;
         case 2:
-            // todo
+            network.reservoirDeficit();
             break;
         case 3:
-            // todo
+            network.initialMetrics();
             break;
         default:
             std::cout << "Invalid option.\n";
@@ -72,6 +72,7 @@ void Menu::chooseEachSpecificCity() {
     std::cout << "\nMaximum amount of water than can reach to...\n"
                  "[1] Each city\n"
                  "[2] Specific city\n"
+                 "[3] Testing\n"
                  "\n[0] Go back.\n"
                  "> ";
     int option;
@@ -82,13 +83,16 @@ void Menu::chooseEachSpecificCity() {
             basicServiceMetrics();
             break;
         case 1:
-            network.allCitiesMaximumFlow();
+            network.allCitiesMaximumFlow2();
             break;
         case 2:
             std::cout << "\nWhich city?"
                          "> ";
             std::cin >> city;
             network.maximumFlow(city);
+            break;
+        case 3:
+            network.allCitiesMaximumFlow();
             break;
         default:
             std::cout << "Invalid option.\n";

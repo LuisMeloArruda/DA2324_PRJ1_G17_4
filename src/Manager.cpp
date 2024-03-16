@@ -6,6 +6,7 @@ void Manager::initializeGraph() {
     readCities();
     readPipes();
     addArtificialSource();
+    addArtificialSink();
 }
 
 void Manager::readReservoirs() {
@@ -114,7 +115,7 @@ void Manager::readPipes() {
 
     string line;
     getline(file, line); // Ignore header
-
+    int id = 0;
     while (getline(file, line)) {
         // Extracting Info
         istringstream ss(line);
@@ -130,6 +131,9 @@ void Manager::readPipes() {
 
         Pipe temp = Pipe(servicePointA, servicePointB, capacity, direction);
 
+        pipes.insert({id, temp});
+        id++;
+
         if (direction) {
             if (!g.addBidirectionalEdge(Station(0, servicePointA), Station(0, servicePointB), capacity)) cout << "BIDIRECTION ERROR" << endl;
         }
@@ -138,7 +142,7 @@ void Manager::readPipes() {
 }
 
 void Manager::addArtificialSource() {
-    Station artificial = Station(0, "");
+    Station artificial = Station(0, "SuperSource");
     g.addVertex(artificial);
     for (Vertex<Station>* v : g.getVertexSet()) {
         if (v->getInfo().getCode()[0] == 'R') {
@@ -147,8 +151,18 @@ void Manager::addArtificialSource() {
     }
 }
 
+void Manager::addArtificialSink() {
+    Station artificial = Station(0, "SuperSink");
+    g.addVertex(artificial);
+    for (Vertex<Station>* v : g.getVertexSet()) {
+        if (v->getInfo().getCode()[0] == 'C') {
+            if (!g.addEdge(v->getInfo(), artificial, INT64_MAX)) cout << "ERROR IN ADDING SUPER SINK" << endl;
+        }
+    }
+}
+
 void Manager::maximumFlow(std::string city) {
-    Station source = Station(0, ""); // Artificial super source
+    Station source = Station(0, "SuperSource"); // Artificial super source
     Station target = Station(0, city);
     int answer = g.edmondsKarp(source, target);
     if (answer == -1) cout << "No water flows into: " << city << endl;
@@ -161,4 +175,71 @@ void Manager::allCitiesMaximumFlow() {
             maximumFlow(v->getInfo().getCode());
         }
     }
+}
+
+void Manager::allCitiesMaximumFlow2() {
+    Station source = Station(0, "SuperSource"); // Artificial super source
+    Station target = Station(0, "SuperSink"); // Artificial super sink
+    int answer = g.edmondsKarp(source, target);
+    cout << "MAXIMUM FLOW OF THE NETWORK: " << answer << endl;
+    for (Vertex<Station>* v : g.getVertexSet()) {
+        if (v->getInfo().getCode()[0] == 'C') {
+            for (Edge<Station>* e : v->getAdj()) {
+                if (e->getDest()->getInfo().getCode() == "SuperSink") {
+                    cout << "<" << v->getInfo().getCode() << "," << e->getFlow() << ">" << endl;
+                }
+            }
+        }
+    }
+}
+
+void Manager::reservoirDeficit() {
+    Station source = Station(0, "SuperSource");
+    Station target = Station(0, "SuperSink");
+    g.edmondsKarp(source, target);
+    cout << "DEFICIT FLOW OF THE NETWORK:" << endl;
+    for (Vertex<Station>* v : g.getVertexSet()) {
+        if (v->getInfo().getCode()[0] == 'C') {
+            for (Edge<Station>* e : v->getAdj()) {
+                if (e->getDest()->getInfo().getCode() == "SuperSink" && (cities.at(v->getInfo().getId()).getDemand() > e->getFlow())) {
+                    cout << "<" << v->getInfo().getCode() << "," << cities.at(v->getInfo().getId()).getDemand() - e->getFlow() << ">" << endl;
+                }
+            }
+        }
+    }
+}
+
+void Manager::initialMetrics() {
+    Station source = Station(0, "SuperSource");
+    Station target = Station(0, "SuperSink");
+    g.edmondsKarp(source, target);
+    cout << "INITIAL METRICS:" << endl;
+    double sum_diff = 0.0;
+    double sum_squared_diff = 0.0;
+    double max_diff = 0.0;
+
+    for (pair<const int, Pipe> pipe : pipes) {
+        auto &pipe_ = pipe.second;
+        int flow = calculatePipeFlow(pipe_.getServicePointA(), pipe_.getServicePointB());
+        double diff = pipe_.getCapacity() - flow;
+        sum_diff += diff;
+        sum_squared_diff += pow(diff, 2);
+        max_diff = std::max(max_diff, diff);
+    }
+    double avg_diff = sum_diff / pipes.size();
+    double variance = sum_squared_diff / pipes.size() - pow(avg_diff, 2);
+    cout << "AVERAGE -> " << avg_diff << endl
+            << "VARIANCE -> " << variance << endl
+            << "MAXIMUM DIFFERENCE -> " << max_diff << endl;
+}
+
+int Manager::calculatePipeFlow(string a, string b) {
+    Station source = Station(0, a);
+    Station target = Station(0, b);
+    Vertex<Station>* s = g.findVertex(source);
+    double flow = 0;
+    for (Edge<Station>* e : s->getAdj()) {
+        if (auto w = e->getDest(); w->getInfo().getCode() == b) flow = e->getFlow();
+    }
+    return flow;
 }
