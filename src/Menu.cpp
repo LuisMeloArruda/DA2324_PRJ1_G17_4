@@ -109,10 +109,12 @@ void Menu::reliabilityAndSensitivity() {
     std::cout << "\nChoose an option:\n"
                  "[1] Evaluate network's resiliency\n"
                  "[2] Temporarily remove pumping stations\n"
-                 "[3] Determine pipeline failures\n"
+                 "[3] Determine pipeline failures in a specific city\n"
+                 "[4] Determine Cities affected by a pipeline\n"
                  "\n[0] Go back.\n"
                  "> ";
     int option;
+    string cityCode;
     std::cin >> option;
     switch (option) {
         case 0:
@@ -125,7 +127,11 @@ void Menu::reliabilityAndSensitivity() {
             // todo
             break;
         case 3:
-            // todo
+            std::cin >> cityCode;
+            network.PipelinesFailures(cityCode);
+            break;
+        case 4:
+            network.AffectedCitiesByPipelines();
             break;
         default:
             std::cout << "Invalid option.\n";

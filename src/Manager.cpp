@@ -161,8 +161,14 @@ void Manager::addArtificialSink() {
     }
 }
 
-void Manager::maximumFlow(std::string city) {
+int Manager::initiateEdmondsKarp() {
     Station source = Station(0, "SuperSource"); // Artificial super source
+    Station target = Station(0, "SuperSink"); // Artificial super sink
+    return g.edmondsKarp(source, target);
+}
+
+void Manager::maximumFlow(std::string city) {
+    Station source = Station(0, "SuperSource");
     Station target = Station(0, city);
     int answer = g.edmondsKarp(source, target);
     if (answer == -1) cout << "No water flows into: " << city << endl;
@@ -178,9 +184,7 @@ void Manager::allCitiesMaximumFlow() {
 }
 
 void Manager::allCitiesMaximumFlow2() {
-    Station source = Station(0, "SuperSource"); // Artificial super source
-    Station target = Station(0, "SuperSink"); // Artificial super sink
-    int answer = g.edmondsKarp(source, target);
+    int answer = initiateEdmondsKarp();
     cout << "MAXIMUM FLOW OF THE NETWORK: " << answer << endl;
     for (Vertex<Station>* v : g.getVertexSet()) {
         if (v->getInfo().getCode()[0] == 'C') {
@@ -194,9 +198,7 @@ void Manager::allCitiesMaximumFlow2() {
 }
 
 void Manager::reservoirDeficit() {
-    Station source = Station(0, "SuperSource");
-    Station target = Station(0, "SuperSink");
-    g.edmondsKarp(source, target);
+    initiateEdmondsKarp();
     cout << "DEFICIT FLOW OF THE NETWORK:" << endl;
     for (Vertex<Station>* v : g.getVertexSet()) {
         if (v->getInfo().getCode()[0] == 'C') {
@@ -210,9 +212,7 @@ void Manager::reservoirDeficit() {
 }
 
 void Manager::initialMetrics() {
-    Station source = Station(0, "SuperSource");
-    Station target = Station(0, "SuperSink");
-    g.edmondsKarp(source, target);
+    initiateEdmondsKarp();
     cout << "INITIAL METRICS:" << endl;
     double sum_diff = 0.0;
     double sum_squared_diff = 0.0;
@@ -242,4 +242,87 @@ int Manager::calculatePipeFlow(string a, string b) {
         if (auto w = e->getDest(); w->getInfo().getCode() == b) flow = e->getFlow();
     }
     return flow;
+}
+
+void Manager::PipelinesFailures(string cityCode) {
+    initiateEdmondsKarp();
+    Station target = Station(0, cityCode);
+    Station source = Station(0, "SuperSource");
+    double temp;
+
+    for (Vertex<Station>* s: g.getVertexSet()) {
+        for (Edge<Station>* e : s->getAdj()) {
+            e->setSelected(false);
+            if (e->getDest()->getInfo().getCode() == "SuperSink") e->setSelected(true);
+            if (e->getOrig()->getInfo().getCode() == "SuperSource") e->setSelected(true);
+        }
+    }
+
+    std::cout << "Critical Pipes to: " << cityCode << endl;
+    Vertex<Station>* city = g.findVertex(target);
+    for (Vertex<Station>* s: g.getVertexSet()) {
+        for (Edge<Station>* e : s->getAdj()) {
+            if (!e->isSelected()) {
+                temp = e->getWeight();
+                e->setWeight(0);
+                if (e->getReverse() != nullptr) e->getReverse()->setWeight(0);
+                g.edmondsKarp(source, target);
+                e->setWeight(temp);
+                if (e->getReverse() != nullptr) e->getReverse()->setWeight(temp);
+                if (city->getFlowRate() <= 0) {
+                    std::cout << e->getOrig()->getInfo().getCode() << " -> " << e->getDest()->getInfo().getCode() << endl;
+                }
+            }
+            e->setSelected(true);
+            if (e->getReverse() != nullptr) e->getReverse()->setSelected(true);
+        }
+    }
+}
+
+void Manager::AffectedCitiesByPipelines() {
+    initiateEdmondsKarp();
+    vector<double> valoresOriginais;
+    bool PrintOneTime = true;
+
+    for (Vertex<Station>* s: g.getVertexSet()) {
+        if (s->getInfo().getCode()[0] == 'C') {
+            valoresOriginais.push_back(s->getFlowRate());
+        }
+        for (Edge<Station>* e : s->getAdj()) {
+            e->setSelected(false);
+            if (e->getDest()->getInfo().getCode() == "SuperSink") e->setSelected(true);
+            if (e->getOrig()->getInfo().getCode() == "SuperSource") e->setSelected(true);
+        }
+    }
+
+
+    for (Vertex<Station> *s : g.getVertexSet()) {
+        for (Edge<Station> *e : s->getAdj()) {
+            if (!e->isSelected()) {
+                double t = e->getWeight();
+                e->setWeight(0);
+                if (e->getReverse() != nullptr) e->getReverse()->setWeight(0);
+                initiateEdmondsKarp();
+                e->setWeight(t);
+                if (e->getReverse() != nullptr) e->getReverse()->setWeight(t);
+                int count = 0;
+                for (Vertex<Station> *p : g.getVertexSet()) {
+                    if (p->getInfo().getCode()[0] != 'C') continue;
+                    if (p->getFlowRate() < valoresOriginais[count]) {
+                        if (PrintOneTime) {
+                        std::cout << "This pipeline: " << e->getOrig()->getInfo().getCode() << " -> " << e->getDest()->getInfo().getCode()
+                                  << " affects: " << endl;
+                        PrintOneTime = false;
+                        }
+                        std::cout << "     -City: " << p->getInfo().getCode() << ", Deficit: " << valoresOriginais[count] - p->getFlowRate() << endl;
+                    }
+                    count++;
+                }
+                PrintOneTime = true;
+
+            }
+            e->setSelected(true);
+            if (e->getReverse() != nullptr) e->getReverse()->setSelected(true);
+        }
+    }
 }

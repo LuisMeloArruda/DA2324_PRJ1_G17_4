@@ -21,6 +21,7 @@ public:
     Vertex(T in);
     bool operator<(Vertex<T> & vertex) const; // // required by MutablePriorityQueue
 
+    double getFlowRate() const;
     T getInfo() const;
     std::vector<Edge<T> *> getAdj() const;
     bool isVisited() const;
@@ -30,6 +31,7 @@ public:
     Edge<T> *getPath() const;
     std::vector<Edge<T> *> getIncoming() const;
 
+    void setFlowRate(double flowRate);
     void setInfo(T info);
     void setVisited(bool visited);
     void setProcesssing(bool processing);
@@ -44,6 +46,7 @@ public:
 protected:
     T info;                // info node
     std::vector<Edge<T> *> adj;  // outgoing edges
+    double flowRate;
 
     // auxiliary fields
     bool visited = false; // used by DFS, BFS, Prim ...
@@ -73,6 +76,7 @@ public:
     Edge<T> *getReverse() const;
     double getFlow() const;
 
+    void setWeight(double weight);
     void setSelected(bool selected);
     void setReverse(Edge<T> *reverse);
     void setFlow(double flow);
@@ -252,6 +256,11 @@ Edge<T> *Vertex<T>::getPath() const {
 }
 
 template <class T>
+double Vertex<T>::getFlowRate() const {
+    return this->flowRate;
+}
+
+template <class T>
 std::vector<Edge<T> *> Vertex<T>::getIncoming() const {
     return this->incoming;
 }
@@ -269,6 +278,11 @@ void Vertex<T>::setVisited(bool visited) {
 template <class T>
 void Vertex<T>::setProcesssing(bool processing) {
     this->processing = processing;
+}
+
+template <class T>
+void Vertex<T>::setFlowRate(double flowRate) {
+    this->flowRate = flowRate;
 }
 
 template <class T>
@@ -350,6 +364,11 @@ void Edge<T>::setReverse(Edge<T> *reverse) {
 template <class T>
 void Edge<T>::setFlow(double flow) {
     this->flow = flow;
+}
+
+template <class T>
+void Edge<T>::setWeight(double weight) {
+    this->weight = weight;
 }
 
 /********************** Graph  ****************************/
@@ -679,6 +698,7 @@ template <class T>
 void Graph<T>:: augmentFlowAlongPath(Vertex<T> *s, Vertex<T> *t, double f) {
     // Traverse the augmenting path and update the flow values accordingly
     for (auto v = t; v != s; ) {
+        v->setFlowRate(v->getFlowRate() + f);
         auto e = v->getPath();
         double flow = e->getFlow();
         if (e->getDest() == v) {
@@ -690,6 +710,7 @@ void Graph<T>:: augmentFlowAlongPath(Vertex<T> *s, Vertex<T> *t, double f) {
             v = e->getDest();
         }
     }
+    s->setFlowRate(s->getFlowRate() + f);
 }
 
 // Main function implementing the Edmonds-Karp algorithm
@@ -704,6 +725,7 @@ int Graph<T>::edmondsKarp(T &source, T &target) {
         throw std::logic_error("Invalid source and/or target vertex");
     // Initialize flow on all edges to 0
     for (auto v : getVertexSet()) {
+        v->setFlowRate(0);
         for (auto e: v->getAdj()) {
             e->setFlow(0);
         }
