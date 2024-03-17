@@ -2,36 +2,38 @@
 #include <limits>
 
 void Menu::mainMenu() {
-    std::cout << "\n\n\n"
-                 "||-----------------------------||\n"
-                 "||   Water Supply Management   ||\n"
-                 "||-----------------------------||\n";
-    std::cout << "\nChoose an option:\n"
-                 "[1] Basic Service Metrics\n"
-                 "[2] Reliability and Sensitivity to Failures\n"
-                 "\n[0] Quit.\n"
-                 "> ";
-    int option;
-    std::cin >> option;
-    if (std::cin.fail()) {
-        std::cout << "Invalid input\n"
+    while (true) {
+        std::cout << "\n\n\n"
+                     "||-----------------------------||\n"
+                     "||   Water Supply Management   ||\n"
+                     "||-----------------------------||\n";
+        std::cout << "\nChoose an option:\n"
+                     "[1] Basic Service Metrics\n"
+                     "[2] Reliability and Sensitivity to Failures\n"
+                     "\n[0] Quit.\n"
                      "> ";
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        mainMenu();
-    } else {
-        switch (option) {
-            case 0:
-                exit(0);
-            case 1:
-                basicServiceMetrics();
-                break;
-            case 2:
-                reliabilityAndSensitivity();
-                break;
-            default:
-                std::cout << "Invalid option.\n";
-                mainMenu();
+        int option;
+        std::cin >> option;
+        if (std::cin.fail()) {
+            std::cout << "Invalid input\n"
+                         "> ";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            mainMenu();
+        } else {
+            switch (option) {
+                case 0:
+                    exit(0);
+                case 1:
+                    basicServiceMetrics();
+                    break;
+                case 2:
+                    reliabilityAndSensitivity();
+                    break;
+                default:
+                    std::cout << "Invalid option.\n";
+                    mainMenu();
+            }
         }
     }
 }
@@ -127,6 +129,8 @@ void Menu::reliabilityAndSensitivity() {
             network.AffectedCitiesByPumping();
             break;
         case 3:
+            std::cout << "\nWhich city?"
+                         "> ";
             std::cin >> cityCode;
             network.PipelinesFailures(cityCode);
             break;
