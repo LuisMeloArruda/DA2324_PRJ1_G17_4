@@ -245,7 +245,6 @@ int Manager::calculatePipeFlow(string a, string b) {
 }
 
 void Manager::PipelinesFailures(string cityCode) {
-    initiateEdmondsKarp();
     Station target = Station(0, cityCode);
     Station source = Station(0, "SuperSource");
     double temp;
@@ -269,7 +268,7 @@ void Manager::PipelinesFailures(string cityCode) {
                 g.edmondsKarp(source, target);
                 e->setWeight(temp);
                 if (e->getReverse() != nullptr) e->getReverse()->setWeight(temp);
-                if (city->getFlowRate() <= 0) {
+                if (city->getFlowRate() <= cities.at(city->getInfo().getId()).getDemand()) {
                     std::cout << e->getOrig()->getInfo().getCode() << " -> " << e->getDest()->getInfo().getCode() << endl;
                 }
             }
