@@ -1,17 +1,23 @@
 #include "Manager.h"
 #include <cstdint>
 
-void Manager::initializeGraph() {
-    readReservoirs();
-    readStations();
-    readCities();
-    readPipes();
+void Manager::initializeGraph(int i) {
+    readReservoirs(i);
+    readStations(i);
+    readCities(i);
+    readPipes(i);
     addArtificialSource();
     addArtificialSink();
 }
 
-void Manager::readReservoirs() {
-    fstream file("../Project1DataSetSmall/Reservoirs_Madeira.csv");
+void Manager::readReservoirs(int i) {
+    string j;
+    if (i == 1) {
+        j = "../Project1DataSetSmall/Reservoirs_Madeira.csv";
+    } else if (i == 2) {
+        j = "../Project1LargeDataSet/Reservoir.csv";
+    }
+    fstream file(j);
 
     if (!file.is_open()) {
         cerr << "Error opening file!" << endl;
@@ -41,8 +47,14 @@ void Manager::readReservoirs() {
     }
 }
 
-void Manager::readStations() {
-    fstream file("../Project1DataSetSmall/Stations_Madeira.csv");
+void Manager::readStations(int i) {
+    string j;
+    if (i == 1) {
+        j = "../Project1DataSetSmall/Stations_Madeira.csv";
+    } else if (i == 2) {
+        j = "../Project1LargeDataSet/Stations.csv";
+    }
+    fstream file(j);
 
     if (!file.is_open()) {
         cerr << "Error opening file!" << endl;
@@ -66,8 +78,14 @@ void Manager::readStations() {
 
 }
 
-void Manager::readCities() {
-    fstream file("../Project1DataSetSmall/Cities_Madeira.csv");
+void Manager::readCities(int i) {
+    string j;
+    if (i == 1) {
+        j = "../Project1DataSetSmall/Cities_Madeira.csv";
+    } else if (i == 2) {
+        j = "../Project1LargeDataSet/Cities.csv";
+    }
+    fstream file(j);
 
     if (!file.is_open()) {
         cerr << "Error opening file!" << endl;
@@ -107,8 +125,14 @@ void Manager::readCities() {
     }
 }
 
-void Manager::readPipes() {
-    fstream file("../Project1DataSetSmall/Pipes_Madeira.csv");
+void Manager::readPipes(int i) {
+    string j;
+    if (i == 1) {
+        j = "../Project1DataSetSmall/Pipes_Madeira.csv";
+    } else if (i == 2) {
+        j = "../Project1LargeDataSet/Pipes.csv";
+    }
+    fstream file(j);
 
     if (!file.is_open()) {
         cerr << "Error opening file!" << endl;
@@ -288,13 +312,7 @@ void Manager::AffectedCitiesByPipelines() {
         if (s->getInfo().getCode()[0] == 'C') {
             originalValues.push_back(s->getFlowRate());
         }
-        for (Edge<Station>* e : s->getAdj()) {
-            e->setSelected(false);
-            if (e->getDest()->getInfo().getCode() == "SuperSink") e->setSelected(true);
-            if (e->getOrig()->getInfo().getCode() == "SuperSource") e->setSelected(true);
-        }
     }
-
 
     for (Vertex<Station> *s : g.getVertexSet()) {
         for (Edge<Station> *e : s->getAdj()) {

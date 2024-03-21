@@ -145,8 +145,29 @@ void Menu::reliabilityAndSensitivity() {
 
 
 Menu::Menu() {
-    // se calhar isto dá jeito para dps escolhermos qual dataset queremos usar (o mais pequeno ou o maior)
     network = Manager();
-    network.initializeGraph();
+    std::cout << "\n\n"
+                 "||-----------------------------||\n"
+                 "||    Which Data Set Do You    ||\n"
+                 "||        Want To Use ?        ||\n"
+                 "||-----------------------------||\n";
+    std::cout << "\nChoose an option:\n"
+                 "[1] Small Data Set - Madeira\n"
+                 "[2] Large Data Set - Portugal\n"
+                 "> ";
+    int option;
+    string cityCode, pumpingCode;
+    std::cin >> option;
+    switch (option) {
+        case 1:
+            network.initializeGraph(1);
+            break;
+        case 2:
+            network.initializeGraph(2);
+            break;
+        default:
+            std::cout << "Invalid option.\n";
+            Menu();
+    }
     mainMenu();
 }

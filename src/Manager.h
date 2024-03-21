@@ -25,31 +25,31 @@ public:
      * @brief Reads data from CSV files and initializes the network.
      * @complexity O()
      */
-    void initializeGraph();
+    void initializeGraph(int i);
 
     /**
      * @brief Reads reservoir data from a CSV file and populates the reservoirs map.
      * @complexity O()
      */
-    void readReservoirs();
+    void readReservoirs(int i);
 
     /**
      * @brief Reads station data from a CSV file and populates the stations map.
      * @complexity O()
      */
-    void readStations();
+    void readStations(int i);
 
     /**
      * @brief Reads city data from a CSV file and populates the cities map.
      * @complexity O()
      */
-    void readCities();
+    void readCities(int i);
 
     /**
      * @brief Reads pipe data from a CSV file and populates the pipes map.
      * @complexity O()
      */
-    void readPipes();
+    void readPipes(int i);
 
     /**
      * @brief Adds an artificial source station to the graph.
