@@ -1,4 +1,5 @@
 #include "Manager.h"
+#include <cstdint>
 
 void Manager::initializeGraph() {
     readReservoirs();
