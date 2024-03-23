@@ -699,7 +699,7 @@ void Graph<T>:: augmentFlowAlongPath(Vertex<T> *s, Vertex<T> *t, double f) {
     // Traverse the augmenting path and update the flow values accordingly
     for (auto v = t; v != s; ) {
         v->setFlowRate(v->getFlowRate() + f);
-        auto e = v->getPath();
+        Edge<Station>* e = v->getPath();
         double flow = e->getFlow();
         if (e->getDest() == v) {
             e->setFlow(flow + f);

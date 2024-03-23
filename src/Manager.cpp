@@ -159,7 +159,7 @@ void Manager::readPipes(int i) {
         pipes.insert({id, temp});
         id++;
 
-        if (direction) {
+        if (!direction) {
             if (!g.addBidirectionalEdge(Station(0, servicePointA), Station(0, servicePointB), capacity)) cout << "BIDIRECTION ERROR" << endl;
         }
         else if (!g.addEdge(Station(0, servicePointA), Station(0, servicePointB), capacity)) cout << "UNI ERROR" << endl;
@@ -181,7 +181,8 @@ void Manager::addArtificialSink() {
     g.addVertex(artificial);
     for (Vertex<Station>* v : g.getVertexSet()) {
         if (v->getInfo().getCode()[0] == 'C') {
-            if (!g.addEdge(v->getInfo(), artificial, INT64_MAX)) cout << "ERROR IN ADDING SUPER SINK" << endl;
+            int demand = cities.at(v->getInfo().getId()).getDemand();
+            if (!g.addEdge(v->getInfo(), artificial, demand)) cout << "ERROR IN ADDING SUPER SINK" << endl;
         }
     }
 }
@@ -269,7 +270,7 @@ int Manager::calculatePipeFlow(string a, string b) {
     return flow;
 }
 
-void Manager::PipelinesFailures(string cityCode) {
+void Manager::pipelinesFailures(string cityCode) {
     Station target = Station(0, cityCode);
     Station source = Station(0, "SuperSource");
     double temp;
@@ -303,7 +304,7 @@ void Manager::PipelinesFailures(string cityCode) {
     }
 }
 
-void Manager::AffectedCitiesByPipelines() {
+void Manager::affectedCitiesByPipelines() {
     initiateEdmondsKarp();
     vector<double> originalValues;
     bool PrintOneTime = true;
@@ -311,6 +312,11 @@ void Manager::AffectedCitiesByPipelines() {
     for (Vertex<Station>* s: g.getVertexSet()) {
         if (s->getInfo().getCode()[0] == 'C') {
             originalValues.push_back(s->getFlowRate());
+        }
+        for (Edge<Station>* e : s->getAdj()) {
+            e->setSelected(false);
+            if (e->getDest()->getInfo().getCode() == "SuperSink") e->setSelected(true);
+            if (e->getOrig()->getInfo().getCode() == "SuperSource") e->setSelected(true);
         }
     }
 
@@ -345,7 +351,7 @@ void Manager::AffectedCitiesByPipelines() {
     }
 }
 
-void Manager::AffectedCitiesByPumping() {
+void Manager::affectedCitiesByPumping() {
     initiateEdmondsKarp();
     vector<double> originalValues;
 
@@ -355,29 +361,28 @@ void Manager::AffectedCitiesByPumping() {
         if (s->getInfo().getCode()[0] == 'C') {
             originalValues.push_back(s->getFlowRate());
         }
-        for (Edge<Station>* e : s->getAdj()) {
-            e->setSelected(false);
-            if (e->getDest()->getInfo().getCode() == "SuperSink") e->setSelected(true);
-            if (e->getOrig()->getInfo().getCode() == "SuperSource") e->setSelected(true);
-        }
     }
 
     for (Vertex<Station>* s: g.getVertexSet()) {
         if (s->getInfo().getCode()[0] != 'P') continue;
+        bool affected_at_least_one_city = false;
         vector<double> capacities = setZeroAndSaveCapacity(s);
         initiateEdmondsKarp();
         int count = 0;
         for (Vertex<Station> *p : g.getVertexSet()) {
             if (p->getInfo().getCode()[0] != 'C') continue;
             if (p->getFlowRate() < originalValues[count]) {
+                affected_at_least_one_city = true;
                 if (PrintOneTime) {
                     std::cout << "The pumping " << s->getInfo().getCode() << " affects: " << endl;
                     PrintOneTime = false;
                 }
-                std::cout << p->getFlowRate();
                 std::cout << "     -City: " << p->getInfo().getCode() << ", Deficit: " << originalValues[count] - p->getFlowRate() << endl;
             }
             count++;
+        }
+        if (!affected_at_least_one_city) {
+            std::cout << "The pumping " << s->getInfo().getCode() << " doesn't affect any city if removed" << endl;
         }
         PrintOneTime = true;
 
@@ -396,4 +401,43 @@ vector<double> Manager::setZeroAndSaveCapacity(Vertex<Station>* v) {
         e->setWeight(0);
     }
     return capacities;
+}
+
+void Manager::affectedCitiesByReservoirs(string reservoirCode) {
+    initiateEdmondsKarp();
+    Station target = Station(0, reservoirCode);
+    Vertex<Station>* reservoir = g.findVertex(target);
+    vector<double> originalValues;
+    vector<double> capacities;
+    bool PrintOneTime = true;
+
+    for (Vertex<Station>* s: g.getVertexSet()) {
+        if (s->getInfo().getCode()[0] == 'C') {
+            originalValues.push_back(s->getFlowRate());
+        }
+    }
+    for (Edge<Station>* e: reservoir->getAdj()) {
+        capacities.push_back(e->getWeight());
+        e->setWeight(0);
+    }
+    initiateEdmondsKarp();
+
+    int count = 0;
+    for (Vertex<Station> *p : g.getVertexSet()) {
+        if (p->getInfo().getCode()[0] != 'C') continue;
+        if (p->getFlowRate() < originalValues[count]) {
+            if (PrintOneTime) {
+                std::cout << "The reservoir " << reservoir->getInfo().getCode() << " affects: " << endl;
+                PrintOneTime = false;
+            }
+            std::cout << "     -City: " << p->getInfo().getCode() << ", Deficit: " << originalValues[count] - p->getFlowRate() << endl;
+        }
+        count++;
+    }
+    PrintOneTime = true;
+
+    int k = 0;
+    for (Edge<Station>* e : reservoir->getAdj()) {
+        e->setWeight(capacities[k++]);
+    }
 }

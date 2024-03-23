@@ -23,18 +23,21 @@ private:
 public:
     /**
      * @brief Reads data from CSV files and initializes the network.
+     * @param i Chooses which data set to use.
      * @complexity O()
      */
     void initializeGraph(int i);
 
     /**
      * @brief Reads reservoir data from a CSV file and populates the reservoirs map.
+     * @param i Chooses which data set to use.
      * @complexity O()
      */
     void readReservoirs(int i);
 
     /**
      * @brief Reads station data from a CSV file and populates the stations map.
+     * @param i Chooses which data set to use.
      * @complexity O()
      */
     void readStations(int i);
@@ -47,6 +50,7 @@ public:
 
     /**
      * @brief Reads pipe data from a CSV file and populates the pipes map.
+     * @param i Chooses which data set to use.
      * @complexity O()
      */
     void readPipes(int i);
@@ -101,11 +105,13 @@ public:
      * @param cityName
      * @complexity
      */
-    void PipelinesFailures(string cityName);
+    void pipelinesFailures(string cityName);
 
-    void AffectedCitiesByPipelines();
+    void affectedCitiesByReservoirs(string reservoirCode);
 
-    void AffectedCitiesByPumping();
+    void affectedCitiesByPipelines();
+
+    void affectedCitiesByPumping();
 
     vector<double> setZeroAndSaveCapacity(Vertex<Station>* v);
 

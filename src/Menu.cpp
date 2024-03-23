@@ -116,26 +116,29 @@ void Menu::reliabilityAndSensitivity() {
                  "\n[0] Go back.\n"
                  "> ";
     int option;
-    string cityCode, pumpingCode;
+    string Code, pumpingCode;
     std::cin >> option;
     switch (option) {
         case 0:
             mainMenu();
             break;
         case 1:
-            // todo
+            std::cout << "\nWhich reservoir?"
+                         "> ";
+            std::cin >> Code;
+            network.affectedCitiesByReservoirs(Code);
             break;
         case 2:
-            network.AffectedCitiesByPumping();
+            network.affectedCitiesByPumping();
             break;
         case 3:
             std::cout << "\nWhich city?"
                          "> ";
-            std::cin >> cityCode;
-            network.PipelinesFailures(cityCode);
+            std::cin >> Code;
+            network.pipelinesFailures(Code);
             break;
         case 4:
-            network.AffectedCitiesByPipelines();
+            network.affectedCitiesByPipelines();
             break;
         default:
             std::cout << "Invalid option.\n";
