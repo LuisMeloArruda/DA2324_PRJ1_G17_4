@@ -6,6 +6,7 @@
 #include <queue>
 #include <limits>
 #include <algorithm>
+#include <unordered_map>
 //#include "../data_structures/MutablePriorityQueue.h"
 
 template <class T>
@@ -75,11 +76,13 @@ public:
     Vertex<T> * getOrig() const;
     Edge<T> *getReverse() const;
     double getFlow() const;
+    double getGradient() const;
 
     void setWeight(double weight);
     void setSelected(bool selected);
     void setReverse(Edge<T> *reverse);
     void setFlow(double flow);
+    void setGradient(double newGradient);
 protected:
     Vertex<T> * dest; // destination vertex
     double weight; // edge weight, can also be used for capacity
@@ -92,6 +95,7 @@ protected:
     Edge<T> *reverse = nullptr;
 
     double flow; // for flow-related problems
+    double gradient; // gradient of the edge
 };
 
 /********************** Graph  ****************************/
@@ -121,7 +125,7 @@ public:
      * @param source Source info.
      * @param target Destination info.
      * @return Maximum flow from source to destination.
-     * @complexity O()
+     * @complexity O(V * E^2), where V is the number of vertices and E is the number of edges.
      */
     int edmondsKarp(T &source, T &target);
 
@@ -130,7 +134,7 @@ public:
      * @param s source Source vertex.
      * @param t dest Destination vertex.
      * @param f Minimum flow from source to destination.
-     * @complexity O()
+     * @complexity O(E), where E is the number of edges
      */
     void augmentFlowAlongPath(Vertex<T> *s, Vertex<T> *t, double f);
 
@@ -139,7 +143,7 @@ public:
      * @param s source Source vertex.
      * @param t dest Destination vertex.
      * @return Minimum flow between the source and target.
-     * @complexity O()
+     * @complexity O(V), where V is the number of vertices.
      */
     double findMinResidualAlongPath(Vertex<T> *s, Vertex<T> *t);
 
@@ -148,9 +152,13 @@ public:
      * @param s source Source vertex.
      * @param t dest Destination vertex.
      * @return True if an augmenting path is found, false otherwise.
-     * @complexity O()
+     * @complexity O(V + E), where V is the number of vertices and E is the number of edges.
      */
     bool findAugmentingPath(Vertex<T> *s, Vertex<T> *t);
+
+    bool modifiedFindAugmentingPath(Vertex<T> *s, Vertex<T> *t, std::unordered_map<string, vector<string>> reservoirs_and_their_affected_cities);
+    int modifiedEdmondsKarp(T &source, T &target);
+
 
     /**
      * @brief Tests and visits a vertex if conditions are met, adding it to the queue.
@@ -158,7 +166,7 @@ public:
      * @param e Pointer to the edge being processed.
      * @param w Pointer to the vertex to be tested and visited.
      * @param residual Residual capacity of the edge.
-     * @complexity O()
+     * @complexity O(1)
      */
     void testAndVisit(std::queue< Vertex<T>*> &q, Edge<T> *e, Vertex<T> *w, double residual);
 protected:
@@ -352,6 +360,11 @@ double Edge<T>::getFlow() const {
 }
 
 template <class T>
+double Edge<T>::getGradient() const {
+    return gradient;
+}
+
+template <class T>
 void Edge<T>::setSelected(bool selected) {
     this->selected = selected;
 }
@@ -370,6 +383,12 @@ template <class T>
 void Edge<T>::setWeight(double weight) {
     this->weight = weight;
 }
+
+template <class T>
+void Edge<T>::setGradient(double newGradient) {
+    this->gradient = newGradient;
+}
+
 
 /********************** Graph  ****************************/
 
@@ -737,6 +756,69 @@ int Graph<T>::edmondsKarp(T &source, T &target) {
     }
     if
     (res == 0) {
+        return -1; // no water found
+    } else {
+        return res;
+    }
+}
+
+template <class T>
+bool Graph<T>::modifiedFindAugmentingPath(Vertex<T> *s, Vertex<T> *t, std::unordered_map<string, vector<string>> reservoirs_and_their_affected_cities) {
+    // Mark all vertices as not visited
+    for(auto v : getVertexSet()) {
+        v->setVisited(false);
+    }
+    // Mark the source vertex as visited and enqueue it
+    s->setVisited(true);
+    std::queue<Vertex<T> *> q;
+    q.push(s);
+    // BFS to find an augmenting path
+    while( ! q.empty() && ! t->isVisited()) {
+        auto v = q.front();
+        /*
+        auto it = reservoirs_and_their_affected_cities.find(v->getInfo());
+
+        if (v not in reservoirs_and_their_affected_cities) reservoirs_and_their_affected_cities.add(v)
+         */
+        q.pop();
+        // Process outgoing edges
+        for(auto e: v->getAdj()) {
+            testAndVisit(q, e, e->getDest(), e->getWeight() - e->getFlow());
+        }
+        // Process incoming edges
+        for(auto e: v->getIncoming()) {
+            testAndVisit(q, e, e->getOrig(), e->getFlow());
+        }
+    }
+    // Return true if a path to the target is found, false otherwise
+    return t->isVisited();
+}
+
+// Main function implementing the Edmonds-Karp algorithm
+template <class T>
+int Graph<T>::modifiedEdmondsKarp(T &source, T &target) {
+    double res = 0;
+    // Find source and target vertices in the graph
+    Vertex<T>* s = findVertex(source);
+    Vertex<T>* t = findVertex(target);
+    // Validate source and target vertices
+    if (s == nullptr || t == nullptr || s == t)
+        throw std::logic_error("Invalid source and/or target vertex");
+    // Initialize flow on all edges to 0
+    for (auto v : getVertexSet()) {
+        v->setFlowRate(0);
+        for (auto e: v->getAdj()) {
+            e->setFlow(0);
+        }
+    }
+    std::unordered_map<string, vector<string>> reservoirs_and_their_affected_cities;
+    // While there is an augmenting path, augment the flow along the path
+    while (modifiedFindAugmentingPath(s, t, reservoirs_and_their_affected_cities)){
+        double f = findMinResidualAlongPath(s, t);
+        res += f;
+        augmentFlowAlongPath(s, t, f);
+    }
+    if (res == 0) {
         return -1; // no water found
     } else {
         return res;

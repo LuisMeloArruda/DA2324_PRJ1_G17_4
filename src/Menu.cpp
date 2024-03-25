@@ -63,6 +63,7 @@ void Menu::basicServiceMetrics() {
             break;
         case 3:
             network.initialMetrics();
+            network.finalMetrics();
             break;
         default:
             std::cout << "Invalid option.\n";

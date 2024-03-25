@@ -254,9 +254,30 @@ void Manager::initialMetrics() {
     }
     double avg_diff = sum_diff / pipes.size();
     double variance = sum_squared_diff / pipes.size() - pow(avg_diff, 2);
-    cout << "AVERAGE -> " << avg_diff << endl
-            << "VARIANCE -> " << variance << endl
-            << "MAXIMUM DIFFERENCE -> " << max_diff << endl;
+    cout << "INITIAL AVERAGE -> " << avg_diff << endl
+         << "INITIAL VARIANCE -> " << variance << endl
+         << "INITIAL MAXIMUM DIFFERENCE -> " << max_diff << endl;
+}
+
+void Manager::finalMetrics() {
+    gradientDescent();
+    cout << "FINAL METRICS:" << endl;
+    double sum_diff = 0.0;
+    double sum_squared_diff = 0.0;
+    double max_diff = 0.0;
+    for (pair<const int, Pipe> pipe : pipes) {
+        auto &pipe_ = pipe.second;
+        int flow = calculatePipeFlow(pipe_.getServicePointA(), pipe_.getServicePointB());
+        double diff = pipe_.getCapacity() - flow;
+        sum_diff += diff;
+        sum_squared_diff += pow(diff, 2);
+        max_diff = std::max(max_diff, diff);
+    }
+    double avg_diff = sum_diff / pipes.size();
+    double variance = sum_squared_diff / pipes.size() - pow(avg_diff, 2);
+    cout << "FINAL AVERAGE -> " << avg_diff << endl
+         << "FINAL VARIANCE -> " << variance << endl
+         << "FINAL MAXIMUM DIFFERENCE -> " << max_diff << endl;
 }
 
 int Manager::calculatePipeFlow(string a, string b) {
@@ -439,5 +460,60 @@ void Manager::affectedCitiesByReservoirs(string reservoirCode) {
     int k = 0;
     for (Edge<Station>* e : reservoir->getAdj()) {
         e->setWeight(capacities[k++]);
+    }
+}
+
+double Manager::computeObjectiveFunction() {
+    double obj = 0.0;
+    for (auto v : g.getVertexSet()) {
+        for (auto e : v->getAdj()) {
+            double deviation = e->getWeight() - e->getFlow();
+            obj += deviation * deviation; // non-negative numbers
+        }
+    }
+    return obj;
+}
+
+void Manager::computeGradient() {
+    for (auto v : g.getVertexSet()) {
+        for (auto e : v->getAdj()) {
+            double deviation = e->getWeight() - e->getFlow();
+            double gradient = -2.0 * deviation;
+            e->setGradient(gradient);
+        }
+    }
+}
+
+void Manager::updateFlowValues(double learningRate) {
+    for (auto v : g.getVertexSet()) {
+        for (auto e : v->getAdj()) {
+            double gradient = e->getGradient();
+            double initialFlow = e->getFlow();
+            double finalFlow = initialFlow - learningRate * gradient;
+            finalFlow = std::max(0.0, std::min(finalFlow, e->getWeight()));
+            e->setFlow(finalFlow);
+        }
+    }
+}
+
+void Manager::gradientDescent() {
+    double learningRate = 0.01;
+    double convergence = 1e-6;
+    double prevObj = std::numeric_limits<double>::infinity();
+    while (true) {
+        computeGradient();
+        updateFlowValues(learningRate);
+        double obj = computeObjectiveFunction();
+        if (std::abs(obj - prevObj) < convergence) break;
+        prevObj = obj;
+    }
+}
+
+void Manager::improvedAffectedCitiesByReservoirs() {
+    initiateEdmondsKarp();
+
+    for (Vertex<Station> *v: g.getVertexSet()) {
+        if (v->getInfo().getCode()[0] != 'R') continue;
+
     }
 }
