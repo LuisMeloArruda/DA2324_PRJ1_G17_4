@@ -93,26 +93,32 @@ public:
      */
     void reservoirDeficit();
 
+    /**
+     * @brief Computes various metrics related to edge flow and weight differences.
+     * It computes the average difference, variance, and the maximum difference.
+     * @return A vector containing three metrics: average difference, variance, and maximum difference.
+     * @complexity O(V + E), V is the number of vertices and E is the number of edges in the graph.
+     */
     vector<double> computeMetrics();
 
     /**
      * @brief Computes initial metrics for the network before balancing.
      * Initial metrics, including average difference, variance, and maximum difference, are computed and printed.
-     * @complexity O(P), where P is the number of pipes in the network.
+     * @complexity O(V * E^2), where V is the number of vertices and E is the number of edges in the graph.
      */
     void initialMetrics();
 
     /**
      * @brief Computes final metrics for the network after balancing.
      * Final metrics, including average difference, variance, and maximum difference, are computed and printed.
-     * @complexity O(P), where P is the number of pipes in the network.
+     * @complexity O(N * E), where N is the number of vertices and E is the number of edges in the graph.
      */
     void finalMetrics();
 
     /**
      * @brief Identify the critical pipelines within a specific city
      * @param cityName
-     * @complexity O(P * (V^2 + E)), where P is the number of pipelines, V is the number of vertices, and E is the number of edges in the graph.
+     * @complexity O(P * (V^2 + E)), where P is the number of pipelines, V is the number of vertices and E is the number of edges in the graph.
      */
     void pipelinesFailures(string cityName);
 
@@ -165,34 +171,18 @@ public:
      */
     void improvedAffectedCitiesByReservoirs();
 
-    // gradient algorithm
-
     /**
-     * @brief
-     * @return
-     * @complexity
-     */
-    double computeObjectiveFunction();
-
-    /**
-     * @brief
-     * @complexity
-     */
-    void computeGradient();
-
-    /**
-     * @brief
-     * @param learningRate
-     * @complexity
-     */
-    void updateFlowValues(double learningRate);
-
-    /**
-     * @brief
-     * @complexity
+     * @brief Perform gradient descent optimization for adjusting edge flows.
+     * @complexity O(N * E), where N is the number of vertices and E is the number of edges in the graph.
      */
     void gradientDescent();
 
+    /**
+     * @brief Balances the network flow.
+     * This function adds artificial source and sink nodes to the graph to balance the network flow
+     * and then performs gradient descent optimization to adjust the flow of edges accordingly.
+     * @complexity O(N * E), where N is the number of vertices and E is the number of edges in the graph.
+     */
     void balanceNetwork();
 };
 
