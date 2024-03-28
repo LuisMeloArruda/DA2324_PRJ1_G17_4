@@ -237,47 +237,46 @@ void Manager::reservoirDeficit() {
     }
 }
 
+vector<double> Manager::computeMetrics() {
+    double n = 0.0, sum_diff = 0.0, max_diff = 0.0, avg_diff = 0.0, variance_diff = 0.0;
+    double tmp;
+    for (auto v : g.getVertexSet()) {
+        for (auto e : v->getAdj()) {
+            tmp = e->getWeight() - e->getFlow();
+            sum_diff += tmp; n++;
+            if (max_diff < tmp) {
+                max_diff = tmp;
+            }
+        }
+    }
+    avg_diff = sum_diff * 1.0 / n;
+    for (auto v : g.getVertexSet()) {
+        for (auto e : v->getAdj()) {
+            variance_diff += pow(e->getWeight() - e->getFlow() - avg_diff, 2);
+        }
+    }
+    variance_diff = variance_diff / n;
+    vector<double> avgvariancemax;
+    avgvariancemax = {avg_diff, variance_diff, max_diff};
+    return avgvariancemax;
+}
+
 void Manager::initialMetrics() {
     initiateEdmondsKarp();
+    vector<double> avgvariancemax = Manager::computeMetrics();
     cout << "INITIAL METRICS:" << endl;
-    double sum_diff = 0.0;
-    double sum_squared_diff = 0.0;
-    double max_diff = 0.0;
-
-    for (pair<const int, Pipe> pipe : pipes) {
-        auto &pipe_ = pipe.second;
-        int flow = calculatePipeFlow(pipe_.getServicePointA(), pipe_.getServicePointB());
-        double diff = pipe_.getCapacity() - flow;
-        sum_diff += diff;
-        sum_squared_diff += pow(diff, 2);
-        max_diff = std::max(max_diff, diff);
-    }
-    double avg_diff = sum_diff / pipes.size();
-    double variance = sum_squared_diff / pipes.size() - pow(avg_diff, 2);
-    cout << "INITIAL AVERAGE -> " << avg_diff << endl
-         << "INITIAL VARIANCE -> " << variance << endl
-         << "INITIAL MAXIMUM DIFFERENCE -> " << max_diff << endl;
+    cout << "INITIAL AVERAGE -> " << avgvariancemax[0] << endl
+         << "INITIAL VARIANCE -> " << avgvariancemax[1] << endl
+         << "INITIAL MAXIMUM DIFFERENCE -> " << avgvariancemax[2] << endl;
 }
 
 void Manager::finalMetrics() {
-    gradientDescent();
+    balanceNetwork();
+    vector<double> avgvariancemax = Manager::computeMetrics();
     cout << "FINAL METRICS:" << endl;
-    double sum_diff = 0.0;
-    double sum_squared_diff = 0.0;
-    double max_diff = 0.0;
-    for (pair<const int, Pipe> pipe : pipes) {
-        auto &pipe_ = pipe.second;
-        int flow = calculatePipeFlow(pipe_.getServicePointA(), pipe_.getServicePointB());
-        double diff = pipe_.getCapacity() - flow;
-        sum_diff += diff;
-        sum_squared_diff += pow(diff, 2);
-        max_diff = std::max(max_diff, diff);
-    }
-    double avg_diff = sum_diff / pipes.size();
-    double variance = sum_squared_diff / pipes.size() - pow(avg_diff, 2);
-    cout << "FINAL AVERAGE -> " << avg_diff << endl
-         << "FINAL VARIANCE -> " << variance << endl
-         << "FINAL MAXIMUM DIFFERENCE -> " << max_diff << endl;
+    cout << "FINAL AVERAGE -> " << avgvariancemax[0] << endl
+         << "FINAL VARIANCE -> " << avgvariancemax[1] << endl
+         << "FINAL MAXIMUM DIFFERENCE -> " << avgvariancemax[2] << endl;
 }
 
 int Manager::calculatePipeFlow(string a, string b) {
@@ -463,49 +462,38 @@ void Manager::affectedCitiesByReservoirs(string reservoirCode) {
     }
 }
 
-double Manager::computeObjectiveFunction() {
-    double obj = 0.0;
-    for (auto v : g.getVertexSet()) {
-        for (auto e : v->getAdj()) {
-            double deviation = e->getWeight() - e->getFlow();
-            obj += deviation * deviation; // non-negative numbers
+void Manager::balanceNetwork() {
+    Station artificialSource = Station(0, "SuperSource");
+    g.addVertex(artificialSource);
+    for (Vertex<Station>* v : g.getVertexSet()) {
+        if (v->getInfo().getCode()[0] == 'R') {
+            if (!g.addEdge(artificialSource, v->getInfo(), reservoirs.at(v->getInfo().getId()).getMaxDelivery())) cout << "ERROR IN ADDING SUPER SOURCE" << endl;
         }
     }
-    return obj;
-}
-
-void Manager::computeGradient() {
-    for (auto v : g.getVertexSet()) {
-        for (auto e : v->getAdj()) {
-            double deviation = e->getWeight() - e->getFlow();
-            double gradient = -2.0 * deviation;
-            e->setGradient(gradient);
+    Station artificialSink = Station(0, "SuperSink");
+    g.addVertex(artificialSink);
+    for (Vertex<Station>* v : g.getVertexSet()) {
+        if (v->getInfo().getCode()[0] == 'C') {
+            double demand = cities.at(v->getInfo().getId()).getDemand();
+            if (!g.addEdge(v->getInfo(), artificialSink, demand)) cout << "ERROR IN ADDING SUPER SINK" << endl;
         }
     }
-}
-
-void Manager::updateFlowValues(double learningRate) {
-    for (auto v : g.getVertexSet()) {
-        for (auto e : v->getAdj()) {
-            double gradient = e->getGradient();
-            double initialFlow = e->getFlow();
-            double finalFlow = initialFlow - learningRate * gradient;
-            finalFlow = std::max(0.0, std::min(finalFlow, e->getWeight()));
-            e->setFlow(finalFlow);
-        }
-    }
+    gradientDescent();
+    g.removeVertex(artificialSink);
+    g.removeVertex(artificialSource);
 }
 
 void Manager::gradientDescent() {
     double learningRate = 0.01;
-    double convergence = 1e-6;
-    double prevObj = std::numeric_limits<double>::infinity();
-    while (true) {
-        computeGradient();
-        updateFlowValues(learningRate);
-        double obj = computeObjectiveFunction();
-        if (std::abs(obj - prevObj) < convergence) break;
-        prevObj = obj;
+    vector<double> avgvariancemax = Manager::computeMetrics();
+    for (int i = 0; i < 1000; i++) {
+        for (auto v : g.getVertexSet()) {
+            for (auto e : v->getAdj()) {
+                if (e->getWeight() > e->getFlow() + avgvariancemax[0] * learningRate) {
+                    e->setFlow(e->getFlow() + avgvariancemax[0] * learningRate);
+                }
+            }
+        }
     }
 }
 

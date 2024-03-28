@@ -93,6 +93,8 @@ public:
      */
     void reservoirDeficit();
 
+    vector<double> computeMetrics();
+
     /**
      * @brief Computes initial metrics for the network before balancing.
      * Initial metrics, including average difference, variance, and maximum difference, are computed and printed.
@@ -190,6 +192,8 @@ public:
      * @complexity
      */
     void gradientDescent();
+
+    void balanceNetwork();
 };
 
 #endif //DA2324_PRJ1_G17_4_MANAGER_H
