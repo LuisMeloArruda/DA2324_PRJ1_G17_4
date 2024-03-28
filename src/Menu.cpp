@@ -10,6 +10,7 @@ void Menu::mainMenu() {
         std::cout << "\nChoose an option:\n"
                      "[1] Basic Service Metrics\n"
                      "[2] Reliability and Sensitivity to Failures\n"
+                     "[3] Change Data Set\n"
                      "\n[0] Quit.\n"
                      "> ";
         int option;
@@ -29,6 +30,9 @@ void Menu::mainMenu() {
                     break;
                 case 2:
                     reliabilityAndSensitivity();
+                    break;
+                case 3:
+                    Menu();
                     break;
                 default:
                     std::cout << "Invalid option.\n";
