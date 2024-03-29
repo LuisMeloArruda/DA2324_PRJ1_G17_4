@@ -150,15 +150,6 @@ public:
     vector<double> setZeroAndSaveCapacity(Vertex<Station>* v);
 
     /**
-     * @brief Retrieve the flow rate of an edge between two stations.
-     * @param a Code of the source station.
-     * @param b Code of the destination station.
-     * @return The flow rate of the edge between stations 'a' and 'b'.
-     * @complexity O(1)
-     */
-    int calculatePipeFlow(string a, string b);
-
-    /**
      * @brief Initiates the Edmonds-Karp algorithm to compute the maximum flow in the network.
      * @return The maximum flow in the network computed using the Edmonds-Karp algorithm.
      * @complexity O(V * E^2), where V is the number of vertices and E is the number of edges in the graph.

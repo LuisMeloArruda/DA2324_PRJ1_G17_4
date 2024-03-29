@@ -242,6 +242,8 @@ vector<double> Manager::computeMetrics() {
     double tmp;
     for (auto v : g.getVertexSet()) {
         for (auto e : v->getAdj()) {
+            if (e->getDest()->getInfo().getCode() == "SuperSink") continue;
+            if (e->getOrig()->getInfo().getCode() == "SuperSource") continue;
             tmp = e->getWeight() - e->getFlow();
             sum_diff += tmp; n++;
             if (max_diff < tmp) {
@@ -252,6 +254,8 @@ vector<double> Manager::computeMetrics() {
     avg_diff = sum_diff * 1.0 / n;
     for (auto v : g.getVertexSet()) {
         for (auto e : v->getAdj()) {
+            if (e->getDest()->getInfo().getCode() == "SuperSink") continue;
+            if (e->getOrig()->getInfo().getCode() == "SuperSource") continue;
             variance_diff += pow(e->getWeight() - e->getFlow() - avg_diff, 2);
         }
     }
@@ -262,7 +266,7 @@ vector<double> Manager::computeMetrics() {
 }
 
 void Manager::initialMetrics() {
-    initiateEdmondsKarp();
+    cout << "Maximum Flow: " << initiateEdmondsKarp() << endl;
     vector<double> avgvariancemax = Manager::computeMetrics();
     cout << "INITIAL METRICS:" << endl;
     cout << "INITIAL AVERAGE -> " << avgvariancemax[0] << endl
@@ -271,6 +275,7 @@ void Manager::initialMetrics() {
 }
 
 void Manager::finalMetrics() {
+    cout << "Maximum Flow: ";
     balanceNetwork();
     vector<double> avgvariancemax = Manager::computeMetrics();
     cout << "FINAL METRICS:" << endl;
@@ -279,20 +284,10 @@ void Manager::finalMetrics() {
          << "FINAL MAXIMUM DIFFERENCE -> " << avgvariancemax[2] << endl;
 }
 
-int Manager::calculatePipeFlow(string a, string b) {
-    Station source = Station(0, a);
-    Station target = Station(0, b);
-    Vertex<Station>* s = g.findVertex(source);
-    double flow = 0;
-    for (Edge<Station>* e : s->getAdj()) {
-        if (auto w = e->getDest(); w->getInfo().getCode() == b) flow = e->getFlow();
-    }
-    return flow;
-}
-
 void Manager::pipelinesFailures(string cityCode) {
     Station target = Station(0, cityCode);
     Station source = Station(0, "SuperSource");
+    g.edmondsKarp(source, target);
     double temp;
 
     for (Vertex<Station>* s: g.getVertexSet()) {
@@ -305,6 +300,7 @@ void Manager::pipelinesFailures(string cityCode) {
 
     std::cout << "Critical Pipes to: " << cityCode << endl;
     Vertex<Station>* city = g.findVertex(target);
+    double flowrate_city_original = city->getFlowRate();
     for (Vertex<Station>* s: g.getVertexSet()) {
         for (Edge<Station>* e : s->getAdj()) {
             if (!e->isSelected()) {
@@ -314,7 +310,8 @@ void Manager::pipelinesFailures(string cityCode) {
                 g.edmondsKarp(source, target);
                 e->setWeight(temp);
                 if (e->getReverse() != nullptr) e->getReverse()->setWeight(temp);
-                if (city->getFlowRate() <= cities.at(city->getInfo().getId()).getDemand()) {
+                double a = cities.at(city->getInfo().getId()).getDemand();
+                if (city->getFlowRate() <= cities.at(city->getInfo().getId()).getDemand() && flowrate_city_original > city->getFlowRate()) {
                     std::cout << e->getOrig()->getInfo().getCode() << " -> " << e->getDest()->getInfo().getCode() << endl;
                 }
             }
@@ -463,24 +460,9 @@ void Manager::affectedCitiesByReservoirs(string reservoirCode) {
 }
 
 void Manager::balanceNetwork() {
-    Station artificialSource = Station(0, "SuperSource");
-    g.addVertex(artificialSource);
-    for (Vertex<Station>* v : g.getVertexSet()) {
-        if (v->getInfo().getCode()[0] == 'R') {
-            if (!g.addEdge(artificialSource, v->getInfo(), reservoirs.at(v->getInfo().getId()).getMaxDelivery())) cout << "ERROR IN ADDING SUPER SOURCE" << endl;
-        }
-    }
-    Station artificialSink = Station(0, "SuperSink");
-    g.addVertex(artificialSink);
-    for (Vertex<Station>* v : g.getVertexSet()) {
-        if (v->getInfo().getCode()[0] == 'C') {
-            double demand = cities.at(v->getInfo().getId()).getDemand();
-            if (!g.addEdge(v->getInfo(), artificialSink, demand)) cout << "ERROR IN ADDING SUPER SINK" << endl;
-        }
-    }
+    addArtificialSource();
+    addArtificialSink();
     gradientDescent();
-    g.removeVertex(artificialSink);
-    g.removeVertex(artificialSource);
 }
 
 void Manager::gradientDescent() {
@@ -491,17 +473,9 @@ void Manager::gradientDescent() {
             for (auto e : v->getAdj()) {
                 if (e->getWeight() > e->getFlow() + avgvariancemax[0] * learningRate) {
                     e->setFlow(e->getFlow() + avgvariancemax[0] * learningRate);
+                    e->getDest()->setFlowRate(e->getDest()->getFlowRate() + e->getFlow() + avgvariancemax[0] * learningRate);
                 }
             }
         }
-    }
-}
-
-void Manager::improvedAffectedCitiesByReservoirs() {
-    initiateEdmondsKarp();
-
-    for (Vertex<Station> *v: g.getVertexSet()) {
-        if (v->getInfo().getCode()[0] != 'R') continue;
-
     }
 }

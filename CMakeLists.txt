@@ -19,4 +19,5 @@ add_executable(DA2324_PRJ1_G17_4
         src/Manager.cpp
         src/Manager.h
         src/Pipe.h
-        src/Pipe.cpp)
+        src/Pipe.cpp
+)
