@@ -5,8 +5,8 @@
 #include <vector>
 #include <queue>
 #include <limits>
-#include <algorithm>
 #include <utility>
+#include <algorithm>
 //#include "../data_structures/MutablePriorityQueue.h"
 
 template <class T>
@@ -121,6 +121,15 @@ public:
     std::vector<T> topsort() const;
 
     /**
+     * @brief Runs a Capacity Scaling algorithm which bases itself on Ford-Fulkerson.
+     * @param source Source info.
+     * @param target Destination info.
+     * @return Maximum flow from source to destination.
+     * @complexity O(V * E^2), where V is the number of vertices and E is the number of edges.
+     */
+    int capacityScaling(T &source, T &target);
+
+    /**
      * @brief Runs an Edmonds-Karp algorithm to determine the maximum flow from the source node to the destination node.
      * @param source Source info.
      * @param target Destination info.
@@ -155,6 +164,16 @@ public:
      * @complexity O(V + E), where V is the number of vertices and E is the number of edges.
      */
     bool findAugmentingPath(Vertex<T> *s, Vertex<T> *t);
+
+    /**
+     * @brief Finds an augmenting path using Breadth-First Search that only considers edges with capacity bigger than
+     * minCapacity from the source vertex to the destination vertex.
+     * @param s Source Vertex
+     * @param t Destination Vertex
+     * @return True if an augmenting path is found, false otherwise.
+     * @complexity O(V + E), where V is the number of vertices and E is the number of edges.
+     */
+    bool findCapacityAugmentingPath(Vertex<T> *s, Vertex<T> *t, double minCapacity);
 
     /**
      * @brief Tests and visits a vertex if conditions are met, adding it to the queue.
@@ -688,6 +707,36 @@ bool Graph<T>::findAugmentingPath(Vertex<T> *s, Vertex<T> *t) {
     return t->isVisited();
 }
 
+// Function to find an augmenting path using Breadth-First Search
+template <class T>
+bool Graph<T>::findCapacityAugmentingPath(Vertex<T> *s, Vertex<T> *t, double minCapacity) {
+    // Mark all vertices as not visited
+    for(auto v : getVertexSet()) {
+        v->setVisited(false);
+    }
+    // Mark the source vertex as visited and enqueue it
+    s->setVisited(true);
+    std::queue<Vertex<T> *> q;
+    q.push(s);
+    // BFS to find an augmenting path
+    while( ! q.empty() && ! t->isVisited()) {
+        auto v = q.front();
+        q.pop();
+        // Process outgoing edges
+        for(auto e: v->getAdj()) {
+            if (e->getWeight() >= minCapacity)
+                testAndVisit(q, e, e->getDest(), e->getWeight() - e->getFlow());
+        }
+        // Process incoming edges
+        for(auto e: v->getIncoming()) {
+            if (e->getWeight() >= minCapacity)
+                testAndVisit(q, e, e->getOrig(), e->getFlow());
+        }
+    }
+    // Return true if a path to the target is found, false otherwise
+    return t->isVisited();
+}
+
 // Function to find the minimum residual capacity along the augmenting path
 template <class T>
 double Graph<T>::findMinResidualAlongPath(Vertex<T> *s, Vertex<T> *t) {
@@ -749,6 +798,47 @@ int Graph<T>::edmondsKarp(T &source, T &target) {
         double f = findMinResidualAlongPath(s, t);
         res += f;
         augmentFlowAlongPath(s, t, f);
+    }
+    if (res == 0) {
+        return -1; // no water found
+    } else {
+        return res;
+    }
+}
+
+// Main function implementing the Capacity Scaling algorithm
+template <class T>
+int Graph<T>::capacityScaling(T &source, T &target) {
+    double maxCapacity = 0;
+    // Find Max Capacity
+    for (Vertex<Station>* v : getVertexSet()) {
+        for (Edge<Station> *e: v->getAdj()) {
+            maxCapacity = max(e->getWeight(), maxCapacity);
+        }
+    }
+    double res = 0;
+    // FInd source and target vertices in the graph
+    Vertex<T>* s = findVertex(source);
+    Vertex<T>* t = findVertex(target);
+    // Validate source and target vertices
+    if (s == nullptr || t == nullptr || s == t)
+        throw std::logic_error("Invalid source and/or target vertex");
+    // Initialize flow on all edges to 0
+    for (auto v : getVertexSet()) {
+        v->setFlowRate(0);
+        for (auto e: v->getAdj()) {
+            e->setFlow(0);
+        }
+    }
+    // While there is an augmenting path, augment the flow along path
+    double D = maxCapacity;
+    while (D >= 1) {
+        while (findCapacityAugmentingPath(s, t, D)) {
+            double f = findMinResidualAlongPath(s, t);
+            res += f;
+            augmentFlowAlongPath(s, t, f);
+        }
+        D /= 2;
     }
     if (res == 0) {
         return -1; // no water found

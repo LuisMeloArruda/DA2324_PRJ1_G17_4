@@ -75,17 +75,11 @@ public:
     void maximumFlow(string city);
 
     /**
-     * @brief Computes the maximum flow for all cities in the network using the Edmonds-Karp algorithm.
-     * @complexity O(N * E^2 * V), where N is the number of cities, E is the number of edges, and V is the number of vertices in the graph.
-     */
-    void allCitiesMaximumFlow();
-
-    /**
      * @brief Computes the maximum flow for all cities in the network and prints the maximum flow of the network
      * and the flow into each city from the artificial sink station.
      * @complexity O(N * E^2 * V), where N is the number of cities, E is the number of edges, and V is the number of vertices in the graph.
      */
-    void allCitiesMaximumFlow2();
+    void allCitiesMaximumFlow();
 
     /**
      * @brief Computes the deficit flow for each city in the network.
@@ -155,26 +149,6 @@ public:
      * @complexity O(V * E^2), where V is the number of vertices and E is the number of edges in the graph.
      */
     int initiateEdmondsKarp();
-
-    /**
-     * @brief
-     * @complexity
-     */
-    void improvedAffectedCitiesByReservoirs();
-
-    /**
-     * @brief Perform gradient descent optimization for adjusting edge flows.
-     * @complexity O(N * E), where N is the number of vertices and E is the number of edges in the graph.
-     */
-    void gradientDescent();
-
-    /**
-     * @brief Balances the network flow.
-     * This function adds artificial source and sink nodes to the graph to balance the network flow
-     * and then performs gradient descent optimization to adjust the flow of edges accordingly.
-     * @complexity O(N * E), where N is the number of vertices and E is the number of edges in the graph.
-     */
-    void balanceNetwork();
 };
 
 #endif //DA2324_PRJ1_G17_4_MANAGER_H

@@ -202,14 +202,7 @@ void Manager::maximumFlow(std::string city) {
 }
 
 void Manager::allCitiesMaximumFlow() {
-    for (Vertex<Station>* v : g.getVertexSet()) {
-        if (v->getInfo().getCode()[0] == 'C') {
-            maximumFlow(v->getInfo().getCode());
-        }
-    }
-}
-
-void Manager::allCitiesMaximumFlow2() {
+    std::ofstream file("../maxFlowHistory.txt", ios_base::app);
     int answer = initiateEdmondsKarp();
     cout << "MAXIMUM FLOW OF THE NETWORK: " << answer << endl;
     for (Vertex<Station>* v : g.getVertexSet()) {
@@ -217,10 +210,13 @@ void Manager::allCitiesMaximumFlow2() {
             for (Edge<Station>* e : v->getAdj()) {
                 if (e->getDest()->getInfo().getCode() == "SuperSink") {
                     cout << "<" << v->getInfo().getCode() << "," << e->getFlow() << ">" << endl;
+                    file << "<" << v->getInfo().getCode() << "," << e->getFlow() << ">" << endl;
                 }
             }
         }
     }
+    file << "--------------" << endl;
+    file.close();
 }
 
 void Manager::reservoirDeficit() {
@@ -275,8 +271,10 @@ void Manager::initialMetrics() {
 }
 
 void Manager::finalMetrics() {
-    cout << "Maximum Flow: ";
-    balanceNetwork();
+    // Run Capacity Scaling
+    Station source = Station(0, "SuperSource");
+    Station target = Station(0, "SuperSink");
+    cout << "Maximum Flow: " << g.capacityScaling(source, target) << endl;
     vector<double> avgvariancemax = Manager::computeMetrics();
     cout << "FINAL METRICS:" << endl;
     cout << "FINAL AVERAGE -> " << avgvariancemax[0] << endl
@@ -456,26 +454,5 @@ void Manager::affectedCitiesByReservoirs(string reservoirCode) {
     int k = 0;
     for (Edge<Station>* e : reservoir->getAdj()) {
         e->setWeight(capacities[k++]);
-    }
-}
-
-void Manager::balanceNetwork() {
-    addArtificialSource();
-    addArtificialSink();
-    gradientDescent();
-}
-
-void Manager::gradientDescent() {
-    double learningRate = 0.01;
-    vector<double> avgvariancemax = Manager::computeMetrics();
-    for (int i = 0; i < 1000; i++) {
-        for (auto v : g.getVertexSet()) {
-            for (auto e : v->getAdj()) {
-                if (e->getWeight() > e->getFlow() + avgvariancemax[0] * learningRate) {
-                    e->setFlow(e->getFlow() + avgvariancemax[0] * learningRate);
-                    e->getDest()->setFlowRate(e->getDest()->getFlowRate() + e->getFlow() + avgvariancemax[0] * learningRate);
-                }
-            }
-        }
     }
 }
