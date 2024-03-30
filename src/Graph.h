@@ -785,8 +785,10 @@ int Graph<T>::edmondsKarp(T &source, T &target) {
     Vertex<T>* s = findVertex(source);
     Vertex<T>* t = findVertex(target);
     // Validate source and target vertices
-    if (s == nullptr || t == nullptr || s == t)
-        throw std::logic_error("Invalid source and/or target vertex");
+    if (s == nullptr || t == nullptr || s == t) {
+        cout << "Invalid source or target vertex. Please verify the provided input." << endl;
+        return -1;
+    }
     // Initialize flow on all edges to 0
     for (auto v : getVertexSet()) {
         v->setFlowRate(0);

@@ -285,7 +285,7 @@ void Manager::finalMetrics() {
 void Manager::pipelinesFailures(string cityCode) {
     Station target = Station(0, cityCode);
     Station source = Station(0, "SuperSource");
-    g.edmondsKarp(source, target);
+    if (g.edmondsKarp(source, target) == -1) return;
     double temp;
 
     for (Vertex<Station>* s: g.getVertexSet()) {
@@ -422,6 +422,10 @@ void Manager::affectedCitiesByReservoirs(string reservoirCode) {
     initiateEdmondsKarp();
     Station target = Station(0, reservoirCode);
     Vertex<Station>* reservoir = g.findVertex(target);
+    if (reservoir == nullptr) {
+        cout << "Invalid Reservoir Code. Please verify the provided input." << endl;
+        return;
+    }
     vector<double> originalValues;
     vector<double> capacities;
     bool PrintOneTime = true;
