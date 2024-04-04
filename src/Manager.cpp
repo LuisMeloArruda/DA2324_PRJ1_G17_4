@@ -209,8 +209,8 @@ void Manager::allCitiesMaximumFlow() {
         if (v->getInfo().getCode()[0] == 'C') {
             for (Edge<Station>* e : v->getAdj()) {
                 if (e->getDest()->getInfo().getCode() == "SuperSink") {
-                    cout << "<" << v->getInfo().getCode() << "," << e->getFlow() << ">" << endl;
-                    file << "<" << v->getInfo().getCode() << "," << e->getFlow() << ">" << endl;
+                    cout << "<" << v->getInfo().getCode() << "," << v->getFlowRate() << ">" << endl;
+                    file << "<" << v->getInfo().getCode() << "," << v->getFlowRate() << ">" << endl;
                 }
             }
         }
@@ -393,6 +393,13 @@ void Manager::simulation(vector<pair<std::string, std::string>> pipes) {
                 break;
             }
         }
+    }
+
+    if (pipesPtr.size() != pipes.size() && pipesPtr.size() != 0) cout << "[WARNING!] One or more input pipe is not valid."
+                                                 " However the simulation ran with the valid pipes." << endl;
+    if (pipesPtr.size() == 0) {
+        cout << "[ERROR!] No valid pipes inputed." << endl;
+        return;
     }
 
     // Set targeted Edge capacity to zero

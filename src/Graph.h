@@ -774,7 +774,6 @@ void Graph<T>:: augmentFlowAlongPath(Vertex<T> *s, Vertex<T> *t, double f) {
             v = e->getDest();
         }
     }
-    s->setFlowRate(s->getFlowRate() + f);
 }
 
 // Main function implementing the Edmonds-Karp algorithm
@@ -801,6 +800,18 @@ int Graph<T>::edmondsKarp(T &source, T &target) {
         res += f;
         augmentFlowAlongPath(s, t, f);
     }
+
+    // Set flow rate of every city
+    for (Vertex<Station>* v : getVertexSet()) {
+        if (v->getInfo().getCode()[0] == 'C') {
+            for (Edge<Station>* e : v->getAdj()) {
+                if (e->getDest()->getInfo().getCode() != "SuperSink") continue;
+                v->setFlowRate(e->getFlow());
+                break;
+            }
+        }
+    }
+
     if (res == 0) {
         return -1; // no water found
     } else {
@@ -842,6 +853,18 @@ int Graph<T>::capacityScaling(T &source, T &target) {
         }
         D /= 2;
     }
+
+    // Set flow rate of every city
+    for (Vertex<Station>* v : getVertexSet()) {
+        if (v->getInfo().getCode()[0] == 'C') {
+            for (Edge<Station>* e : v->getAdj()) {
+                if (e->getDest()->getInfo().getCode() != "SuperSink") continue;
+                v->setFlowRate(e->getFlow());
+                break;
+            }
+        }
+    }
+
     if (res == 0) {
         return -1; // no water found
     } else {
