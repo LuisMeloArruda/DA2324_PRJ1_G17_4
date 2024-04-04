@@ -114,10 +114,13 @@ void Menu::reliabilityAndSensitivity() {
                  "[2] Temporarily remove pumping stations\n"
                  "[3] Determine pipeline failures in a specific city\n"
                  "[4] Determine Cities affected by a pipeline\n"
+                 "[5] Enter Pipeline Failure Simulation\n"
                  "\n[0] Go back.\n"
                  "> ";
     int option;
-    string Code, pumpingCode;
+    string Code, choice = "N";
+    vector<pair<string, string>> pipes;
+    pair<string, string> pipe;
     std::cin >> option;
     switch (option) {
         case 0:
@@ -140,6 +143,21 @@ void Menu::reliabilityAndSensitivity() {
             break;
         case 4:
             network.affectedCitiesByPipelines();
+            break;
+        case 5:
+            do {
+                std::cout << "\nOrigin Station: ";
+                std::cin >> Code;
+                pipe.first = Code;
+                std::cout << "Target Station: ";
+                std::cin >> Code;
+                pipe.second = Code;
+                pipes.push_back(pipe);
+                network.simulation(pipes);
+                std::cout << "\nRemove another pipe [Y/N]: ";
+                std::cin >> choice;
+            } while (choice == "Y");
+            pipes.clear();
             break;
         default:
             std::cout << "Invalid option.\n";

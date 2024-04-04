@@ -136,6 +136,13 @@ public:
     void affectedCitiesByPumping();
 
     /**
+     * @brief This function removes pipes from the graph and prints out the affected cities
+     * @param pipes Pipes to be removed
+     * If any of the pipes are invalid the function doesn't do anything and prints out an error
+     */
+    void simulation(vector<pair<string, string>> pipes);
+
+    /**
      * @brief Set all incoming edges to zero and store in a vector
      * @param v ointer to the vertex whose incoming edges' capacities are to be stored.
      * @return The original capacities of the incoming edges of a vertex

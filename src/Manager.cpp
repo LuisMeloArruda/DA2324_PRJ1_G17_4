@@ -226,7 +226,10 @@ void Manager::reservoirDeficit() {
         if (v->getInfo().getCode()[0] == 'C') {
             for (Edge<Station>* e : v->getAdj()) {
                 if (e->getDest()->getInfo().getCode() == "SuperSink" && (cities.at(v->getInfo().getId()).getDemand() > e->getFlow())) {
-                    cout << "<" << v->getInfo().getCode() << "," << cities.at(v->getInfo().getId()).getDemand() - e->getFlow() << ">" << endl;
+                    cout << v->getInfo().getCode() << ": " << endl;
+                    cout << " - Demand: " << cities.at(v->getInfo().getId()).getDemand() << endl;
+                    cout << " - Actual Flow: " << e->getFlow() << endl;
+                    cout << " - Deficit: " << cities.at(v->getInfo().getId()).getDemand() - e->getFlow() << endl;
                 }
             }
         }
@@ -310,7 +313,9 @@ void Manager::pipelinesFailures(string cityCode) {
                 if (e->getReverse() != nullptr) e->getReverse()->setWeight(temp);
                 double a = cities.at(city->getInfo().getId()).getDemand();
                 if (city->getFlowRate() <= cities.at(city->getInfo().getId()).getDemand() && flowrate_city_original > city->getFlowRate()) {
-                    std::cout << e->getOrig()->getInfo().getCode() << " -> " << e->getDest()->getInfo().getCode() << endl;
+                    std::cout << e->getOrig()->getInfo().getCode() << " ";
+                    if (e->getReverse() != nullptr) cout << "<";
+                    std::cout << "-> " << e->getDest()->getInfo().getCode() << endl;
                 }
             }
             e->setSelected(true);
@@ -349,7 +354,9 @@ void Manager::affectedCitiesByPipelines() {
                     if (p->getInfo().getCode()[0] != 'C') continue;
                     if (p->getFlowRate() < originalValues[count]) {
                         if (PrintOneTime) {
-                        std::cout << "This pipeline " << e->getOrig()->getInfo().getCode() << " -> " << e->getDest()->getInfo().getCode()
+                        std::cout << "This pipeline " << e->getOrig()->getInfo().getCode() << " ";
+                        if (e->getReverse() != nullptr) cout << "<";
+                        std::cout << "-> " << e->getDest()->getInfo().getCode()
                                   << " affects: " << endl;
                         PrintOneTime = false;
                         }
@@ -363,6 +370,64 @@ void Manager::affectedCitiesByPipelines() {
             e->setSelected(true);
             if (e->getReverse() != nullptr) e->getReverse()->setSelected(true);
         }
+    }
+}
+
+void Manager::simulation(vector<pair<std::string, std::string>> pipes) {
+    initiateEdmondsKarp();
+    vector<double> originalValues;
+    vector<Edge<Station>*> pipesPtr;
+    vector<double> pipeOriginalCapacity;
+    bool PrintOneTime = true;
+
+    // Store Original flow values and find edges to be removed
+    for (Vertex<Station>* s: g.getVertexSet()) {
+        if (s->getInfo().getCode()[0] == 'C') {
+            originalValues.push_back(s->getFlowRate());
+        }
+        for (pair<string, string> pipe : pipes) {
+            if (pipe.first != s->getInfo().getCode()) continue;
+            for (Edge<Station> *e : s->getAdj()) {
+                if (pipe.second != e->getDest()->getInfo().getCode()) continue;
+                pipesPtr.push_back(e);
+                break;
+            }
+        }
+    }
+
+    // Set targeted Edge capacity to zero
+    cout << "Removing of the following pipes: " << endl;
+    for (Edge<Station>* e : pipesPtr) {
+        pipeOriginalCapacity.push_back(e->getWeight());
+        e->setWeight(0);
+        if (e->getReverse() != nullptr) e->getReverse()->setWeight(0);
+        cout << e->getOrig()->getInfo().getCode() << " ";
+        if (e->getReverse() != nullptr) cout << "<";
+        cout << "-> " << e->getDest()->getInfo().getCode() << endl;
+    }
+
+    initiateEdmondsKarp();
+
+    // Find affected cities
+    int count = 0;
+    for (Vertex<Station> *p : g.getVertexSet()) {
+        if (p->getInfo().getCode()[0] != 'C') continue;
+        if (p->getFlowRate() < originalValues[count]) {
+            if (count == 0) cout << "Affects the following cities" << endl;
+            std::cout << "     -City: " << p->getInfo().getCode() << ", Old Flow: " << originalValues[count]
+            << ", New Flow: " << p->getFlowRate() << ", Deficit: " << originalValues[count] - p->getFlowRate() << endl;
+            count++;
+        }
+    }
+
+    if (count == 0) cout << "Doesn't affect any cities" << endl;
+
+    // Restore capacity values
+    count = 0;
+    for (Edge<Station>* e : pipesPtr) {
+        e->setWeight(pipeOriginalCapacity[count]);
+        if (e->getReverse() != nullptr) e->getReverse()->setWeight(pipeOriginalCapacity[count]);
+        count++;
     }
 }
 
@@ -392,7 +457,8 @@ void Manager::affectedCitiesByPumping() {
                     std::cout << "The pumping " << s->getInfo().getCode() << " affects: " << endl;
                     PrintOneTime = false;
                 }
-                std::cout << "     -City: " << p->getInfo().getCode() << ", Deficit: " << originalValues[count] - p->getFlowRate() << endl;
+                std::cout << "     -City: " << p->getInfo().getCode() << ", Old Flow: " << originalValues[count]
+                << ", New Flow: " << p->getFlowRate() << ", Deficit: " << originalValues[count] - p->getFlowRate() << endl;
             }
             count++;
         }
@@ -449,7 +515,8 @@ void Manager::affectedCitiesByReservoirs(string reservoirCode) {
                 std::cout << "The reservoir " << reservoir->getInfo().getCode() << " affects: " << endl;
                 PrintOneTime = false;
             }
-            std::cout << "     -City: " << p->getInfo().getCode() << ", Deficit: " << originalValues[count] - p->getFlowRate() << endl;
+            std::cout << "     -City: " << p->getInfo().getCode()  << ", Old Flow: " << originalValues[count]
+            << ", New Flow: " << p->getFlowRate() << ", Deficit: " << originalValues[count] - p->getFlowRate() << endl;
         }
         count++;
     }
