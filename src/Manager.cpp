@@ -378,7 +378,6 @@ void Manager::simulation(vector<pair<std::string, std::string>> pipes) {
     vector<double> originalValues;
     vector<Edge<Station>*> pipesPtr;
     vector<double> pipeOriginalCapacity;
-    bool PrintOneTime = true;
 
     // Store Original flow values and find edges to be removed
     for (Vertex<Station>* s: g.getVertexSet()) {
@@ -416,18 +415,19 @@ void Manager::simulation(vector<pair<std::string, std::string>> pipes) {
     initiateEdmondsKarp();
 
     // Find affected cities
-    int count = 0;
+    int count = 0, affected = 0;
     for (Vertex<Station> *p : g.getVertexSet()) {
         if (p->getInfo().getCode()[0] != 'C') continue;
         if (p->getFlowRate() < originalValues[count]) {
-            if (count == 0) cout << "Affects the following cities" << endl;
+            if (affected == 0) cout << "Affects the following cities" << endl;
             std::cout << "     -City: " << p->getInfo().getCode() << ", Old Flow: " << originalValues[count]
             << ", New Flow: " << p->getFlowRate() << ", Deficit: " << originalValues[count] - p->getFlowRate() << endl;
-            count++;
+            affected++;
         }
+        count++;
     }
 
-    if (count == 0) cout << "Doesn't affect any cities" << endl;
+    if (affected == 0) cout << "Doesn't affect any cities" << endl;
 
     // Restore capacity values
     count = 0;
