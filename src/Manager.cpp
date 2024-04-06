@@ -239,8 +239,26 @@ void Manager::reservoirDeficit() {
 vector<double> Manager::computeMetrics() {
     double n = 0.0, sum_diff = 0.0, max_diff = 0.0, avg_diff = 0.0, variance_diff = 0.0;
     double tmp;
+
+    // Set all edges are not being selected
+    for (Vertex<Station>* v : g.getVertexSet()) {
+        for (Edge<Station>* e : v->getAdj()) {
+            e->setSelected(false);
+        }
+    }
+
+    // Mark all inverse pipes that are not being used
+    for (Vertex<Station>* v : g.getVertexSet()) {
+        for (Edge<Station>* e : v->getAdj()) {
+            if (e->getReverse() == nullptr) continue;
+            if (e->getReverse()->getFlow() == 0 && !e->isSelected())
+                e->getReverse()->setSelected(true);
+        }
+    }
+
     for (auto v : g.getVertexSet()) {
         for (auto e : v->getAdj()) {
+            if (e->isSelected()) continue;
             if (e->getDest()->getInfo().getCode() == "SuperSink") continue;
             if (e->getOrig()->getInfo().getCode() == "SuperSource") continue;
             tmp = e->getWeight() - e->getFlow();
@@ -250,9 +268,11 @@ vector<double> Manager::computeMetrics() {
             }
         }
     }
+
     avg_diff = sum_diff * 1.0 / n;
     for (auto v : g.getVertexSet()) {
         for (auto e : v->getAdj()) {
+            if (e->isSelected()) continue;
             if (e->getDest()->getInfo().getCode() == "SuperSink") continue;
             if (e->getOrig()->getInfo().getCode() == "SuperSource") continue;
             variance_diff += pow(e->getWeight() - e->getFlow() - avg_diff, 2);

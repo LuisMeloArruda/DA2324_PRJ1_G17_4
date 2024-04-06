@@ -724,13 +724,17 @@ bool Graph<T>::findCapacityAugmentingPath(Vertex<T> *s, Vertex<T> *t, double min
         q.pop();
         // Process outgoing edges
         for(auto e: v->getAdj()) {
-            if (e->getWeight() >= minCapacity)
+            if (e->getWeight() >= minCapacity) {
+                if (e->getReverse() != nullptr && e->getReverse()->getFlow() != 0) continue;
                 testAndVisit(q, e, e->getDest(), e->getWeight() - e->getFlow());
+            }
         }
         // Process incoming edges
         for(auto e: v->getIncoming()) {
-            if (e->getWeight() >= minCapacity)
+            if (e->getWeight() >= minCapacity) {
+                if (e->getReverse() != nullptr && e->getReverse()->getFlow() != 0) continue;
                 testAndVisit(q, e, e->getOrig(), e->getFlow());
+            }
         }
     }
     // Return true if a path to the target is found, false otherwise
