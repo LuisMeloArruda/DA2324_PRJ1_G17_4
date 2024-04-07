@@ -746,139 +746,168 @@ $(function() {
 <div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;        q.pop();</div>
 <div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;        <span class="comment">// Process outgoing edges</span></div>
 <div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> e: v-&gt;getAdj()) {</div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;            <span class="keywordflow">if</span> (e-&gt;getWeight() &gt;= minCapacity)</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;                testAndVisit(q, e, e-&gt;getDest(), e-&gt;getWeight() - e-&gt;getFlow());</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;        }</div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;        <span class="comment">// Process incoming edges</span></div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> e: v-&gt;getIncoming()) {</div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;            <span class="keywordflow">if</span> (e-&gt;getWeight() &gt;= minCapacity)</div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;                testAndVisit(q, e, e-&gt;getOrig(), e-&gt;getFlow());</div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;        }</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;    }</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;    <span class="comment">// Return true if a path to the target is found, false otherwise</span></div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;    <span class="keywordflow">return</span> t-&gt;isVisited();</div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;}</div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160; </div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;<span class="comment">// Function to find the minimum residual capacity along the augmenting path</span></div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00742"></a><span class="lineno"><a class="line" href="class_graph.html#a5a8fe8c1552124482985fc8c5e9fbfb2">  742</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="class_graph.html#a5a8fe8c1552124482985fc8c5e9fbfb2">Graph&lt;T&gt;::findMinResidualAlongPath</a>(<a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a> *s, <a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a> *t) {</div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;    <span class="keywordtype">double</span> f = INF;</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;    <span class="comment">// Traverse the augmenting path to find the minimum residual capacity</span></div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> v = t; v != s; ) {</div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;        <span class="keyword">auto</span> e = v-&gt;getPath();</div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;        <span class="keywordflow">if</span> (e-&gt;getDest() == v) {</div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;            f = std::min(f, e-&gt;getWeight() - e-&gt;getFlow());</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;            v = e-&gt;getOrig();</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;        }</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;        <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;            f = std::min(f, e-&gt;getFlow());</div>
-<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;            v = e-&gt;getDest();</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;            <span class="keywordflow">if</span> (e-&gt;getWeight() &gt;= minCapacity) {</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;                <span class="keywordflow">if</span> (e-&gt;getReverse() != <span class="keyword">nullptr</span> &amp;&amp; e-&gt;getReverse()-&gt;getFlow() != 0) <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;                testAndVisit(q, e, e-&gt;getDest(), e-&gt;getWeight() - e-&gt;getFlow());</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;            }</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;        }</div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;        <span class="comment">// Process incoming edges</span></div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> e: v-&gt;getIncoming()) {</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;            <span class="keywordflow">if</span> (e-&gt;getWeight() &gt;= minCapacity) {</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;                <span class="keywordflow">if</span> (e-&gt;getReverse() != <span class="keyword">nullptr</span> &amp;&amp; e-&gt;getReverse()-&gt;getFlow() != 0) <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;                testAndVisit(q, e, e-&gt;getOrig(), e-&gt;getFlow());</div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;            }</div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;        }</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;    }</div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;    <span class="comment">// Return true if a path to the target is found, false otherwise</span></div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;    <span class="keywordflow">return</span> t-&gt;isVisited();</div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;}</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160; </div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;<span class="comment">// Function to find the minimum residual capacity along the augmenting path</span></div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00746"></a><span class="lineno"><a class="line" href="class_graph.html#a5a8fe8c1552124482985fc8c5e9fbfb2">  746</a></span>&#160;<span class="keywordtype">double</span> <a class="code" href="class_graph.html#a5a8fe8c1552124482985fc8c5e9fbfb2">Graph&lt;T&gt;::findMinResidualAlongPath</a>(<a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a> *s, <a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a> *t) {</div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;    <span class="keywordtype">double</span> f = INF;</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;    <span class="comment">// Traverse the augmenting path to find the minimum residual capacity</span></div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> v = t; v != s; ) {</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;        <span class="keyword">auto</span> e = v-&gt;getPath();</div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;        <span class="keywordflow">if</span> (e-&gt;getDest() == v) {</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;            f = std::min(f, e-&gt;getWeight() - e-&gt;getFlow());</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;            v = e-&gt;getOrig();</div>
 <div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;        }</div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;    }</div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;    <span class="comment">// Return the minimum residual capacity</span></div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;    <span class="keywordflow">return</span> f;</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;}</div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160; </div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;<span class="comment">// Function to augment flow along the augmenting path with the given flow value</span></div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00762"></a><span class="lineno"><a class="line" href="class_graph.html#acd3158ca10299be0fb0eef8f0338e8c7">  762</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_graph.html#acd3158ca10299be0fb0eef8f0338e8c7">Graph&lt;T&gt;:: augmentFlowAlongPath</a>(<a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a> *s, <a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a> *t, <span class="keywordtype">double</span> f) {</div>
-<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;    <span class="comment">// Traverse the augmenting path and update the flow values accordingly</span></div>
-<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> v = t; v != s; ) {</div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;        v-&gt;setFlowRate(v-&gt;getFlowRate() + f);</div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;        <a class="code" href="class_edge.html">Edge&lt;Station&gt;</a>* e = v-&gt;getPath();</div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;        <span class="keywordtype">double</span> flow = e-&gt;getFlow();</div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;        <span class="keywordflow">if</span> (e-&gt;getDest() == v) {</div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;            e-&gt;setFlow(flow + f);</div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;            v = e-&gt;getOrig();</div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;        }</div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;        <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;            e-&gt;setFlow(flow - f);</div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;            v = e-&gt;getDest();</div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;        <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;            f = std::min(f, e-&gt;getFlow());</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;            v = e-&gt;getDest();</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;        }</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;    }</div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;    <span class="comment">// Return the minimum residual capacity</span></div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;    <span class="keywordflow">return</span> f;</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;}</div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160; </div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;<span class="comment">// Function to augment flow along the augmenting path with the given flow value</span></div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00766"></a><span class="lineno"><a class="line" href="class_graph.html#acd3158ca10299be0fb0eef8f0338e8c7">  766</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_graph.html#acd3158ca10299be0fb0eef8f0338e8c7">Graph&lt;T&gt;:: augmentFlowAlongPath</a>(<a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a> *s, <a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a> *t, <span class="keywordtype">double</span> f) {</div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;    <span class="comment">// Traverse the augmenting path and update the flow values accordingly</span></div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> v = t; v != s; ) {</div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;        v-&gt;setFlowRate(v-&gt;getFlowRate() + f);</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;        <a class="code" href="class_edge.html">Edge&lt;Station&gt;</a>* e = v-&gt;getPath();</div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;        <span class="keywordtype">double</span> flow = e-&gt;getFlow();</div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;        <span class="keywordflow">if</span> (e-&gt;getDest() == v) {</div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;            e-&gt;setFlow(flow + f);</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;            v = e-&gt;getOrig();</div>
 <div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;        }</div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;    }</div>
-<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;    s-&gt;setFlowRate(s-&gt;getFlowRate() + f);</div>
-<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;}</div>
-<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160; </div>
-<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;<span class="comment">// Main function implementing the Edmonds-Karp algorithm</span></div>
-<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00782"></a><span class="lineno"><a class="line" href="class_graph.html#a5aa8f2bf2c03dadd4a1bfac4b0b81b73">  782</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="class_graph.html#a5aa8f2bf2c03dadd4a1bfac4b0b81b73">Graph&lt;T&gt;::edmondsKarp</a>(T &amp;source, T &amp;target) {</div>
-<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;    <span class="keywordtype">double</span> res = 0;</div>
-<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;    <span class="comment">// Find source and target vertices in the graph</span></div>
-<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;    <a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a>* s = findVertex(source);</div>
-<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;    <a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a>* t = findVertex(target);</div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;    <span class="comment">// Validate source and target vertices</span></div>
-<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    <span class="keywordflow">if</span> (s == <span class="keyword">nullptr</span> || t == <span class="keyword">nullptr</span> || s == t)</div>
-<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;        <span class="keywordflow">throw</span> std::logic_error(<span class="stringliteral">&quot;Invalid source and/or target vertex&quot;</span>);</div>
-<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;    <span class="comment">// Initialize flow on all edges to 0</span></div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> v : getVertexSet()) {</div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;        v-&gt;setFlowRate(0);</div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">auto</span> e: v-&gt;getAdj()) {</div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;            e-&gt;setFlow(0);</div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;        }</div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;    }<span class="comment">// While there is an augmenting path, augment the flow along the path</span></div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;    <span class="keywordflow">while</span> (findAugmentingPath(s, t) ) {</div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;        <span class="keywordtype">double</span> f = findMinResidualAlongPath(s, t);</div>
-<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;        res += f;</div>
-<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;        augmentFlowAlongPath(s, t, f);</div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;    }</div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;    <span class="keywordflow">if</span> (res == 0) {</div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;        <span class="keywordflow">return</span> -1; <span class="comment">// no water found</span></div>
-<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;        <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;        <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;            e-&gt;setFlow(flow - f);</div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;            v = e-&gt;getDest();</div>
+<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;        }</div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;    }</div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;}</div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160; </div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;<span class="comment">// Main function implementing the Edmonds-Karp algorithm</span></div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00785"></a><span class="lineno"><a class="line" href="class_graph.html#a5aa8f2bf2c03dadd4a1bfac4b0b81b73">  785</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="class_graph.html#a5aa8f2bf2c03dadd4a1bfac4b0b81b73">Graph&lt;T&gt;::edmondsKarp</a>(T &amp;source, T &amp;target) {</div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;    <span class="keywordtype">double</span> res = 0;</div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;    <span class="comment">// Find source and target vertices in the graph</span></div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    <a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a>* s = findVertex(source);</div>
+<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;    <a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a>* t = findVertex(target);</div>
+<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;    <span class="comment">// Validate source and target vertices</span></div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;    <span class="keywordflow">if</span> (s == <span class="keyword">nullptr</span> || t == <span class="keyword">nullptr</span> || s == t) {</div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;        cout &lt;&lt; <span class="stringliteral">&quot;Invalid source or target vertex. Please verify the provided input.&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;        <span class="keywordflow">return</span> -1;</div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;    }</div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;    <span class="comment">// Initialize flow on all edges to 0</span></div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> v : getVertexSet()) {</div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;        v-&gt;setFlowRate(0);</div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">auto</span> e: v-&gt;getAdj()) {</div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;            e-&gt;setFlow(0);</div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;        }</div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;    }<span class="comment">// While there is an augmenting path, augment the flow along the path</span></div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;    <span class="keywordflow">while</span> (findAugmentingPath(s, t) ) {</div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;        <span class="keywordtype">double</span> f = findMinResidualAlongPath(s, t);</div>
+<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;        res += f;</div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;        augmentFlowAlongPath(s, t, f);</div>
 <div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;    }</div>
-<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;}</div>
-<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160; </div>
-<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;<span class="comment">// Main function implementing the Capacity Scaling algorithm</span></div>
-<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
-<div class="line"><a name="l00811"></a><span class="lineno"><a class="line" href="class_graph.html#a6915c373bd42212eff83d27d2ceced11">  811</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="class_graph.html#a6915c373bd42212eff83d27d2ceced11">Graph&lt;T&gt;::capacityScaling</a>(T &amp;source, T &amp;target) {</div>
-<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;    <span class="keywordtype">double</span> maxCapacity = 0;</div>
-<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;    <span class="comment">// Find Max Capacity</span></div>
-<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;    <span class="keywordflow">for</span> (<a class="code" href="class_vertex.html">Vertex&lt;Station&gt;</a>* v : getVertexSet()) {</div>
-<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;        <span class="keywordflow">for</span> (<a class="code" href="class_edge.html">Edge&lt;Station&gt;</a> *e: v-&gt;getAdj()) {</div>
-<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;            maxCapacity = max(e-&gt;getWeight(), maxCapacity);</div>
-<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;        }</div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;    }</div>
-<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;    <span class="keywordtype">double</span> res = 0;</div>
-<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;    <span class="comment">// FInd source and target vertices in the graph</span></div>
-<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;    <a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a>* s = findVertex(source);</div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;    <a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a>* t = findVertex(target);</div>
-<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;    <span class="comment">// Validate source and target vertices</span></div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;    <span class="keywordflow">if</span> (s == <span class="keyword">nullptr</span> || t == <span class="keyword">nullptr</span> || s == t)</div>
-<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;        <span class="keywordflow">throw</span> std::logic_error(<span class="stringliteral">&quot;Invalid source and/or target vertex&quot;</span>);</div>
-<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;    <span class="comment">// Initialize flow on all edges to 0</span></div>
-<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> v : getVertexSet()) {</div>
-<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;        v-&gt;setFlowRate(0);</div>
-<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">auto</span> e: v-&gt;getAdj()) {</div>
-<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;            e-&gt;setFlow(0);</div>
-<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;        }</div>
-<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;    }</div>
-<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;    <span class="comment">// While there is an augmenting path, augment the flow along path</span></div>
-<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;    <span class="keywordtype">double</span> D = maxCapacity;</div>
-<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;    <span class="keywordflow">while</span> (D &gt;= 1) {</div>
-<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;        <span class="keywordflow">while</span> (findCapacityAugmentingPath(s, t, D)) {</div>
-<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;            <span class="keywordtype">double</span> f = findMinResidualAlongPath(s, t);</div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;            res += f;</div>
-<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;            augmentFlowAlongPath(s, t, f);</div>
-<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;        }</div>
-<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;        D /= 2;</div>
-<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;    }</div>
-<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;    <span class="keywordflow">if</span> (res == 0) {</div>
-<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;        <span class="keywordflow">return</span> -1; <span class="comment">// no water found</span></div>
-<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;        <span class="keywordflow">return</span> res;</div>
-<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;    }</div>
-<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;}</div>
-<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160; </div>
-<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//DA2324_PRJ1_G17_4_GRAPH_H</span></div>
+<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160; </div>
+<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;    <span class="comment">// Set flow rate of every city</span></div>
+<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;    <span class="keywordflow">for</span> (<a class="code" href="class_vertex.html">Vertex&lt;Station&gt;</a>* v : getVertexSet()) {</div>
+<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;        <span class="keywordflow">if</span> (v-&gt;getInfo().getCode()[0] == <span class="charliteral">&#39;C&#39;</span>) {</div>
+<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;            <span class="keywordflow">for</span> (<a class="code" href="class_edge.html">Edge&lt;Station&gt;</a>* e : v-&gt;getAdj()) {</div>
+<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;                <span class="keywordflow">if</span> (e-&gt;getDest()-&gt;getInfo().getCode() != <span class="stringliteral">&quot;SuperSink&quot;</span>) <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;                v-&gt;setFlowRate(e-&gt;getFlow());</div>
+<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;                <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;            }</div>
+<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;        }</div>
+<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;    }</div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160; </div>
+<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;    <span class="keywordflow">if</span> (res == 0) {</div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;        <span class="keywordflow">return</span> -1; <span class="comment">// no water found</span></div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;        <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;    }</div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;}</div>
+<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160; </div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;<span class="comment">// Main function implementing the Capacity Scaling algorithm</span></div>
+<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
+<div class="line"><a name="l00828"></a><span class="lineno"><a class="line" href="class_graph.html#a6915c373bd42212eff83d27d2ceced11">  828</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="class_graph.html#a6915c373bd42212eff83d27d2ceced11">Graph&lt;T&gt;::capacityScaling</a>(T &amp;source, T &amp;target) {</div>
+<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;    <span class="keywordtype">double</span> maxCapacity = 0;</div>
+<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;    <span class="comment">// Find Max Capacity</span></div>
+<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;    <span class="keywordflow">for</span> (<a class="code" href="class_vertex.html">Vertex&lt;Station&gt;</a>* v : getVertexSet()) {</div>
+<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;        <span class="keywordflow">for</span> (<a class="code" href="class_edge.html">Edge&lt;Station&gt;</a> *e: v-&gt;getAdj()) {</div>
+<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;            maxCapacity = max(e-&gt;getWeight(), maxCapacity);</div>
+<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;        }</div>
+<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;    }</div>
+<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;    <span class="keywordtype">double</span> res = 0;</div>
+<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;    <span class="comment">// FInd source and target vertices in the graph</span></div>
+<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;    <a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a>* s = findVertex(source);</div>
+<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;    <a class="code" href="class_vertex.html">Vertex&lt;T&gt;</a>* t = findVertex(target);</div>
+<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;    <span class="comment">// Validate source and target vertices</span></div>
+<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;    <span class="keywordflow">if</span> (s == <span class="keyword">nullptr</span> || t == <span class="keyword">nullptr</span> || s == t)</div>
+<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;        <span class="keywordflow">throw</span> std::logic_error(<span class="stringliteral">&quot;Invalid source and/or target vertex&quot;</span>);</div>
+<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;    <span class="comment">// Initialize flow on all edges to 0</span></div>
+<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;    <span class="keywordflow">for</span> (<span class="keyword">auto</span> v : getVertexSet()) {</div>
+<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;        v-&gt;setFlowRate(0);</div>
+<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">auto</span> e: v-&gt;getAdj()) {</div>
+<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;            e-&gt;setFlow(0);</div>
+<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;        }</div>
+<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;    }</div>
+<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;    <span class="comment">// While there is an augmenting path, augment the flow along path</span></div>
+<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;    <span class="keywordtype">double</span> D = maxCapacity;</div>
+<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;    <span class="keywordflow">while</span> (D &gt;= 1) {</div>
+<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;        <span class="keywordflow">while</span> (findCapacityAugmentingPath(s, t, D)) {</div>
+<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;            <span class="keywordtype">double</span> f = findMinResidualAlongPath(s, t);</div>
+<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;            res += f;</div>
+<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;            augmentFlowAlongPath(s, t, f);</div>
+<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;        }</div>
+<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;        D /= 2;</div>
+<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;    }</div>
+<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160; </div>
+<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;    <span class="comment">// Set flow rate of every city</span></div>
+<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;    <span class="keywordflow">for</span> (<a class="code" href="class_vertex.html">Vertex&lt;Station&gt;</a>* v : getVertexSet()) {</div>
+<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;        <span class="keywordflow">if</span> (v-&gt;getInfo().getCode()[0] == <span class="charliteral">&#39;C&#39;</span>) {</div>
+<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;            <span class="keywordflow">for</span> (<a class="code" href="class_edge.html">Edge&lt;Station&gt;</a>* e : v-&gt;getAdj()) {</div>
+<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;                <span class="keywordflow">if</span> (e-&gt;getDest()-&gt;getInfo().getCode() != <span class="stringliteral">&quot;SuperSink&quot;</span>) <span class="keywordflow">continue</span>;</div>
+<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;                v-&gt;setFlowRate(e-&gt;getFlow());</div>
+<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;                <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;            }</div>
+<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;        }</div>
+<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;    }</div>
+<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160; </div>
+<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;    <span class="keywordflow">if</span> (res == 0) {</div>
+<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;        <span class="keywordflow">return</span> -1; <span class="comment">// no water found</span></div>
+<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;    } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;        <span class="keywordflow">return</span> res;</div>
+<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;    }</div>
+<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;}</div>
+<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160; </div>
+<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//DA2324_PRJ1_G17_4_GRAPH_H</span></div>
 <div class="ttc" id="aclass_edge_html"><div class="ttname"><a href="class_edge.html">Edge</a></div><div class="ttdef"><b>Definition:</b> Graph.h:69</div></div>
 <div class="ttc" id="aclass_graph_html"><div class="ttname"><a href="class_graph.html">Graph</a></div><div class="ttdef"><b>Definition:</b> Graph.h:104</div></div>
 <div class="ttc" id="aclass_graph_html_a039221fcb215967752f3672f39ae5206"><div class="ttname"><a href="class_graph.html#a039221fcb215967752f3672f39ae5206">Graph::findAugmentingPath</a></div><div class="ttdeci">bool findAugmentingPath(Vertex&lt; T &gt; *s, Vertex&lt; T &gt; *t)</div><div class="ttdoc">Finds an augmenting path using Breadth-First Search from the source vertex to the destination vertex.</div><div class="ttdef"><b>Definition:</b> Graph.h:684</div></div>
 <div class="ttc" id="aclass_graph_html_a040e0550c056f4df7e21b078d9cf7548"><div class="ttname"><a href="class_graph.html#a040e0550c056f4df7e21b078d9cf7548">Graph::findCapacityAugmentingPath</a></div><div class="ttdeci">bool findCapacityAugmentingPath(Vertex&lt; T &gt; *s, Vertex&lt; T &gt; *t, double minCapacity)</div><div class="ttdoc">Finds an augmenting path using Breadth-First Search that only considers edges with capacity bigger th...</div><div class="ttdef"><b>Definition:</b> Graph.h:712</div></div>
 <div class="ttc" id="aclass_graph_html_a48009b3e803da7c058b08a0dbeb19474"><div class="ttname"><a href="class_graph.html#a48009b3e803da7c058b08a0dbeb19474">Graph::testAndVisit</a></div><div class="ttdeci">void testAndVisit(std::queue&lt; Vertex&lt; T &gt; * &gt; &amp;q, Edge&lt; T &gt; *e, Vertex&lt; T &gt; *w, double residual)</div><div class="ttdoc">Tests and visits a vertex if conditions are met, adding it to the queue.</div><div class="ttdef"><b>Definition:</b> Graph.h:673</div></div>
-<div class="ttc" id="aclass_graph_html_a5a8fe8c1552124482985fc8c5e9fbfb2"><div class="ttname"><a href="class_graph.html#a5a8fe8c1552124482985fc8c5e9fbfb2">Graph::findMinResidualAlongPath</a></div><div class="ttdeci">double findMinResidualAlongPath(Vertex&lt; T &gt; *s, Vertex&lt; T &gt; *t)</div><div class="ttdoc">Finds the minimum residual capacity along the augmenting path from the source vertex to the destinati...</div><div class="ttdef"><b>Definition:</b> Graph.h:742</div></div>
-<div class="ttc" id="aclass_graph_html_a5aa8f2bf2c03dadd4a1bfac4b0b81b73"><div class="ttname"><a href="class_graph.html#a5aa8f2bf2c03dadd4a1bfac4b0b81b73">Graph::edmondsKarp</a></div><div class="ttdeci">int edmondsKarp(T &amp;source, T &amp;target)</div><div class="ttdoc">Runs an Edmonds-Karp algorithm to determine the maximum flow from the source node to the destination ...</div><div class="ttdef"><b>Definition:</b> Graph.h:782</div></div>
-<div class="ttc" id="aclass_graph_html_a6915c373bd42212eff83d27d2ceced11"><div class="ttname"><a href="class_graph.html#a6915c373bd42212eff83d27d2ceced11">Graph::capacityScaling</a></div><div class="ttdeci">int capacityScaling(T &amp;source, T &amp;target)</div><div class="ttdoc">Runs a Capacity Scaling algorithm which bases itself on Ford-Fulkerson.</div><div class="ttdef"><b>Definition:</b> Graph.h:811</div></div>
-<div class="ttc" id="aclass_graph_html_acd3158ca10299be0fb0eef8f0338e8c7"><div class="ttname"><a href="class_graph.html#acd3158ca10299be0fb0eef8f0338e8c7">Graph::augmentFlowAlongPath</a></div><div class="ttdeci">void augmentFlowAlongPath(Vertex&lt; T &gt; *s, Vertex&lt; T &gt; *t, double f)</div><div class="ttdoc">Augments the flow along the augmenting path from the source vertex to the destination vertex.</div><div class="ttdef"><b>Definition:</b> Graph.h:762</div></div>
+<div class="ttc" id="aclass_graph_html_a5a8fe8c1552124482985fc8c5e9fbfb2"><div class="ttname"><a href="class_graph.html#a5a8fe8c1552124482985fc8c5e9fbfb2">Graph::findMinResidualAlongPath</a></div><div class="ttdeci">double findMinResidualAlongPath(Vertex&lt; T &gt; *s, Vertex&lt; T &gt; *t)</div><div class="ttdoc">Finds the minimum residual capacity along the augmenting path from the source vertex to the destinati...</div><div class="ttdef"><b>Definition:</b> Graph.h:746</div></div>
+<div class="ttc" id="aclass_graph_html_a5aa8f2bf2c03dadd4a1bfac4b0b81b73"><div class="ttname"><a href="class_graph.html#a5aa8f2bf2c03dadd4a1bfac4b0b81b73">Graph::edmondsKarp</a></div><div class="ttdeci">int edmondsKarp(T &amp;source, T &amp;target)</div><div class="ttdoc">Runs an Edmonds-Karp algorithm to determine the maximum flow from the source node to the destination ...</div><div class="ttdef"><b>Definition:</b> Graph.h:785</div></div>
+<div class="ttc" id="aclass_graph_html_a6915c373bd42212eff83d27d2ceced11"><div class="ttname"><a href="class_graph.html#a6915c373bd42212eff83d27d2ceced11">Graph::capacityScaling</a></div><div class="ttdeci">int capacityScaling(T &amp;source, T &amp;target)</div><div class="ttdoc">Runs a Capacity Scaling algorithm which bases itself on Ford-Fulkerson.</div><div class="ttdef"><b>Definition:</b> Graph.h:828</div></div>
+<div class="ttc" id="aclass_graph_html_acd3158ca10299be0fb0eef8f0338e8c7"><div class="ttname"><a href="class_graph.html#acd3158ca10299be0fb0eef8f0338e8c7">Graph::augmentFlowAlongPath</a></div><div class="ttdeci">void augmentFlowAlongPath(Vertex&lt; T &gt; *s, Vertex&lt; T &gt; *t, double f)</div><div class="ttdoc">Augments the flow along the augmenting path from the source vertex to the destination vertex.</div><div class="ttdef"><b>Definition:</b> Graph.h:766</div></div>
 <div class="ttc" id="aclass_vertex_html"><div class="ttname"><a href="class_vertex.html">Vertex</a></div><div class="ttdef"><b>Definition:</b> Graph.h:20</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

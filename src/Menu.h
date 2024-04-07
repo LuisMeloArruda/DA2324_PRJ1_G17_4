@@ -31,8 +31,7 @@ public:
     void reliabilityAndSensitivity();
 
     /**
-     * @brief Allows choose between each or a specific city to
-     * determine the maximum amount of water than can reach
+     * @brief Allows choose between each or a specific city to determine the maximum amount of water than can reach
      * @complexity O(N * E^2 * V), where N is the number of cities, E is the number of edges, and V is the number of vertices in the graph.
      */
     void chooseEachSpecificCity();

@@ -134,6 +134,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_manager.html#aa1b25c9866c66569152f3b14f6836b73">affectedCitiesByPumping</a> ()</td></tr>
 <tr class="memdesc:aa1b25c9866c66569152f3b14f6836b73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the affected and non-affected cities by a removed pumping @complexity O(P * (V^2 + E)), where P is the number of pumping stations, V is the number of vertices, and E is the number of edges in the graph. <br /></td></tr>
 <tr class="separator:aa1b25c9866c66569152f3b14f6836b73"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdfc21d4a31b2fea2ba00f7498bd7ae1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_manager.html#abdfc21d4a31b2fea2ba00f7498bd7ae1">simulation</a> (vector&lt; pair&lt; string, string &gt;&gt; pipes)</td></tr>
+<tr class="memdesc:abdfc21d4a31b2fea2ba00f7498bd7ae1"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function removes pipes from the graph and prints out the affected cities. If any of the pipes are invalid the function doesn't do anything and prints out an error.  <a href="class_manager.html#abdfc21d4a31b2fea2ba00f7498bd7ae1">More...</a><br /></td></tr>
+<tr class="separator:abdfc21d4a31b2fea2ba00f7498bd7ae1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a418013d23d97777e4ac4eabc7383a2e5"><td class="memItemLeft" align="right" valign="top">vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_manager.html#a418013d23d97777e4ac4eabc7383a2e5">setZeroAndSaveCapacity</a> (<a class="el" href="class_vertex.html">Vertex</a>&lt; <a class="el" href="class_station.html">Station</a> &gt; *v)</td></tr>
 <tr class="memdesc:a418013d23d97777e4ac4eabc7383a2e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set all incoming edges to zero and store in a vector.  <a href="class_manager.html#a418013d23d97777e4ac4eabc7383a2e5">More...</a><br /></td></tr>
 <tr class="separator:a418013d23d97777e4ac4eabc7383a2e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -401,11 +404,37 @@ unordered_map&lt; int, <a class="el" href="class_pipe.html">Pipe</a> &gt;&#160;<
 <p>Set all incoming edges to zero and store in a vector. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">v</td><td>ointer to the vertex whose incoming edges' capacities are to be stored. </td></tr>
+    <tr><td class="paramname">v</td><td>pointer to the vertex whose incoming edges' capacities are to be stored. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The original capacities of the incoming edges of a vertex @complexity O(K), where K is the number of incoming edges of the vertex. </dd></dl>
+
+</div>
+</div>
+<a id="abdfc21d4a31b2fea2ba00f7498bd7ae1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abdfc21d4a31b2fea2ba00f7498bd7ae1">&#9670;&nbsp;</a></span>simulation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Manager::simulation </td>
+          <td>(</td>
+          <td class="paramtype">vector&lt; pair&lt; string, string &gt;&gt;&#160;</td>
+          <td class="paramname"><em>pipes</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>This function removes pipes from the graph and prints out the affected cities. If any of the pipes are invalid the function doesn't do anything and prints out an error. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pipes</td><td>Pipes to be removed @complexity O(V * E^2), where V is the number of vertices and E is the number of edges in the graph. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

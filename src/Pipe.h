@@ -70,8 +70,8 @@ public:
     void setDirection(bool direction);
 
     /**
-     * @brief Equality operator for comparing two pioes.
-     * @param secondPipe The second pipr to compare with.
+     * @brief Equality operator for comparing two pipes.
+     * @param secondPipe The second pipe to compare with.
      * @return True if both pipes have the same service points, otherwise false.
      * @complexity O(1)
      */

@@ -13,5 +13,6 @@ var searchData=
   ['setservicepointa_59',['setServicePointA',['../class_pipe.html#a9e231b9c7a1e85b7c7c2ed37cd30e4f0',1,'Pipe']]],
   ['setservicepointb_60',['setServicePointB',['../class_pipe.html#aafb0d65608e5a1e1e1999ce7671a0d37',1,'Pipe']]],
   ['setzeroandsavecapacity_61',['setZeroAndSaveCapacity',['../class_manager.html#a418013d23d97777e4ac4eabc7383a2e5',1,'Manager']]],
-  ['station_62',['Station',['../class_station.html',1,'Station'],['../class_station.html#a5bd5f5c6c385783d3399f801139c9fbc',1,'Station::Station()']]]
+  ['simulation_62',['simulation',['../class_manager.html#abdfc21d4a31b2fea2ba00f7498bd7ae1',1,'Manager']]],
+  ['station_63',['Station',['../class_station.html',1,'Station'],['../class_station.html#a5bd5f5c6c385783d3399f801139c9fbc',1,'Station::Station()']]]
 ];
