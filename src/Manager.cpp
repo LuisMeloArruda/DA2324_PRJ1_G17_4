@@ -331,7 +331,6 @@ void Manager::pipelinesFailures(string cityCode) {
                 g.edmondsKarp(source, target);
                 e->setWeight(temp);
                 if (e->getReverse() != nullptr) e->getReverse()->setWeight(temp);
-                double a = cities.at(city->getInfo().getId()).getDemand();
                 if (city->getFlowRate() <= cities.at(city->getInfo().getId()).getDemand() && flowrate_city_original > city->getFlowRate()) {
                     std::cout << e->getOrig()->getInfo().getCode() << " ";
                     if (e->getReverse() != nullptr) cout << "<";

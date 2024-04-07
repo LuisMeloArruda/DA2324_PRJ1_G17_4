@@ -808,11 +808,11 @@ int Graph<T>::edmondsKarp(T &source, T &target) {
     // Set flow rate of every city
     for (Vertex<Station>* v : getVertexSet()) {
         if (v->getInfo().getCode()[0] == 'C') {
-            for (Edge<Station>* e : v->getAdj()) {
-                if (e->getDest()->getInfo().getCode() != "SuperSink") continue;
-                v->setFlowRate(e->getFlow());
-                break;
+            double sum = 0;
+            for (Edge<Station>* e : v->getIncoming()) {
+                sum += e->getFlow();
             }
+            v->setFlowRate(sum);
         }
     }
 
