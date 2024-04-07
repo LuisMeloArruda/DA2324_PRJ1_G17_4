@@ -196,11 +196,12 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Augments the flow along the augmenting path from the source vertex to the destination vertex. </p>
+<p>Complexity: O(E), where E is the number of edges</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">s</td><td>source Source vertex. </td></tr>
     <tr><td class="paramname">t</td><td>dest Destination vertex. </td></tr>
-    <tr><td class="paramname">f</td><td>Minimum flow from source to destination. @complexity O(E), where E is the number of edges </td></tr>
+    <tr><td class="paramname">f</td><td>Minimum flow from source to destination. </td></tr>
   </table>
   </dd>
 </dl>
@@ -236,6 +237,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Runs a Capacity Scaling algorithm which bases itself on Ford-Fulkerson. </p>
+<p>Complexity: O(V * E^2), where V is the number of vertices and E is the number of edges.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>Source info. </td></tr>
@@ -243,7 +245,7 @@ template&lt;class T &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Maximum flow from source to destination. @complexity O(V * E^2), where V is the number of vertices and E is the number of edges. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Maximum flow from source to destination. </dd></dl>
 
 </div>
 </div>
@@ -276,6 +278,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Runs an Edmonds-Karp algorithm to determine the maximum flow from the source node to the destination node. </p>
+<p>Complexity: O(V * E^2), where V is the number of vertices and E is the number of edges.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">source</td><td>Source info. </td></tr>
@@ -283,7 +286,7 @@ template&lt;class T &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Maximum flow from source to destination. @complexity O(V * E^2), where V is the number of vertices and E is the number of edges. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Maximum flow from source to destination. </dd></dl>
 
 </div>
 </div>
@@ -316,6 +319,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Finds an augmenting path using Breadth-First Search from the source vertex to the destination vertex. </p>
+<p>Complexity: O(V + E), where V is the number of vertices and E is the number of edges.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">s</td><td>source Source vertex. </td></tr>
@@ -323,7 +327,7 @@ template&lt;class T &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>True if an augmenting path is found, false otherwise. @complexity O(V + E), where V is the number of vertices and E is the number of edges. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if an augmenting path is found, false otherwise. </dd></dl>
 
 </div>
 </div>
@@ -362,6 +366,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Finds an augmenting path using Breadth-First Search that only considers edges with capacity bigger than minCapacity from the source vertex to the destination vertex. </p>
+<p>Complexity: O(V + E), where V is the number of vertices and E is the number of edges.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">s</td><td>Source <a class="el" href="class_vertex.html">Vertex</a> </td></tr>
@@ -369,7 +374,7 @@ template&lt;class T &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>True if an augmenting path is found, false otherwise. @complexity O(V + E), where V is the number of vertices and E is the number of edges. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if an augmenting path is found, false otherwise. </dd></dl>
 
 </div>
 </div>
@@ -402,6 +407,7 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Finds the minimum residual capacity along the augmenting path from the source vertex to the destination vertex. </p>
+<p>Complexity: O(V), where V is the number of vertices.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">s</td><td>source Source vertex. </td></tr>
@@ -409,7 +415,7 @@ template&lt;class T &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Minimum flow between the source and target. @complexity O(V), where V is the number of vertices. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Minimum flow between the source and target. </dd></dl>
 
 </div>
 </div>
@@ -454,12 +460,13 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Tests and visits a vertex if conditions are met, adding it to the queue. </p>
+<p>Complexity: O(1)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">q</td><td>Reference to the queue used for BFS traversal. </td></tr>
     <tr><td class="paramname">e</td><td>Pointer to the edge being processed. </td></tr>
     <tr><td class="paramname">w</td><td>Pointer to the vertex to be tested and visited. </td></tr>
-    <tr><td class="paramname">residual</td><td>Residual capacity of the edge. @complexity O(1) </td></tr>
+    <tr><td class="paramname">residual</td><td>Residual capacity of the edge. </td></tr>
   </table>
   </dd>
 </dl>

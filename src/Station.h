@@ -43,9 +43,11 @@ public:
 
     /**
      * @brief Equality operator for comparing two stations.
+     *
+     * Complexity: O(1)
+     *
      * @param secondStation The second station to compare with.
      * @return True if both stations have the same code, otherwise false.
-     * @complexity O(1)
      */
     bool operator==(const Station &secondStation) const;
 };

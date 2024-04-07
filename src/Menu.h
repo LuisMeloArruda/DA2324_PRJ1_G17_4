@@ -14,25 +14,33 @@ public:
 
     /**
      * @brief Displays the Main Menu options.
-     * @complexity O(N * E^2 * V), where N is the number of cities, E is the number of edges, and V is the number of vertices in the graph.
+     *
+     * Complexity: O(N * E^2 * V), where N is the number of cities, E is the number of edges, and V is the number of vertices in the graph.
+     *
      */
     void mainMenu();
 
     /**
      * @brief Displays Basic Service Metrics.
-     * @complexity O(N * E^2 * V), where N is the number of cities, E is the number of edges, and V is the number of vertices in the graph.
+     *
+     * Complexity: O(N * E^2 * V), where N is the number of cities, E is the number of edges, and V is the number of vertices in the graph.
+     *
      */
     void basicServiceMetrics();
 
     /**
      * @brief Displays Reliability And Sensitivity.
-     * @complexity  O(N * (V^2 + E)), where N is the number of cities, V is the number of vertices, and E is the number of edges in the graph.
+     *
+     * Complexity:  O(N * (V^2 + E)), where N is the number of cities, V is the number of vertices, and E is the number of edges in the graph.
+     *
      */
     void reliabilityAndSensitivity();
 
     /**
      * @brief Allows choose between each or a specific city to determine the maximum amount of water than can reach
-     * @complexity O(N * E^2 * V), where N is the number of cities, E is the number of edges, and V is the number of vertices in the graph.
+     *
+     * Complexity: O(N * E^2 * V), where N is the number of cities, E is the number of edges, and V is the number of vertices in the graph.
+     *
      */
     void chooseEachSpecificCity();
 private:

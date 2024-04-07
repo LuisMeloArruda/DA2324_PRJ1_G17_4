@@ -122,66 +122,80 @@ public:
 
     /**
      * @brief Runs a Capacity Scaling algorithm which bases itself on Ford-Fulkerson.
+     *
+     * Complexity: O(V * E^2), where V is the number of vertices and E is the number of edges.
+     *
      * @param source Source info.
      * @param target Destination info.
      * @return Maximum flow from source to destination.
-     * @complexity O(V * E^2), where V is the number of vertices and E is the number of edges.
      */
     int capacityScaling(T &source, T &target);
 
     /**
      * @brief Runs an Edmonds-Karp algorithm to determine the maximum flow from the source node to the destination node.
+     *
+     * Complexity: O(V * E^2), where V is the number of vertices and E is the number of edges.
+     *
      * @param source Source info.
      * @param target Destination info.
      * @return Maximum flow from source to destination.
-     * @complexity O(V * E^2), where V is the number of vertices and E is the number of edges.
      */
     int edmondsKarp(T &source, T &target);
 
     /**
      * @brief Augments the flow along the augmenting path from the source vertex to the destination vertex.
+     *
+     * Complexity: O(E), where E is the number of edges
+     *
      * @param s source Source vertex.
      * @param t dest Destination vertex.
      * @param f Minimum flow from source to destination.
-     * @complexity O(E), where E is the number of edges
      */
     void augmentFlowAlongPath(Vertex<T> *s, Vertex<T> *t, double f);
 
     /**
      * @brief Finds the minimum residual capacity along the augmenting path from the source vertex to the destination vertex.
+     *
+     * Complexity: O(V), where V is the number of vertices.
+     *
      * @param s source Source vertex.
      * @param t dest Destination vertex.
      * @return Minimum flow between the source and target.
-     * @complexity O(V), where V is the number of vertices.
      */
     double findMinResidualAlongPath(Vertex<T> *s, Vertex<T> *t);
 
     /**
      * @brief Finds an augmenting path using Breadth-First Search from the source vertex to the destination vertex.
+     *
+     * Complexity: O(V + E), where V is the number of vertices and E is the number of edges.
+     *
      * @param s source Source vertex.
      * @param t dest Destination vertex.
      * @return True if an augmenting path is found, false otherwise.
-     * @complexity O(V + E), where V is the number of vertices and E is the number of edges.
      */
     bool findAugmentingPath(Vertex<T> *s, Vertex<T> *t);
 
     /**
      * @brief Finds an augmenting path using Breadth-First Search that only considers edges with capacity bigger than
      * minCapacity from the source vertex to the destination vertex.
+     *
+     * Complexity: O(V + E), where V is the number of vertices and E is the number of edges.
+     *
      * @param s Source Vertex
      * @param t Destination Vertex
      * @return True if an augmenting path is found, false otherwise.
-     * @complexity O(V + E), where V is the number of vertices and E is the number of edges.
      */
     bool findCapacityAugmentingPath(Vertex<T> *s, Vertex<T> *t, double minCapacity);
 
     /**
      * @brief Tests and visits a vertex if conditions are met, adding it to the queue.
+     *
+     * Complexity: O(1)
+     *
      * @param q Reference to the queue used for BFS traversal.
      * @param e Pointer to the edge being processed.
      * @param w Pointer to the vertex to be tested and visited.
      * @param residual Residual capacity of the edge.
-     * @complexity O(1)
      */
     void testAndVisit(std::queue< Vertex<T>*> &q, Edge<T> *e, Vertex<T> *w, double residual);
 protected:

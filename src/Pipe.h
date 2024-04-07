@@ -71,9 +71,11 @@ public:
 
     /**
      * @brief Equality operator for comparing two pipes.
+     *
+     * Complexity: O(1)
+     *
      * @param secondPipe The second pipe to compare with.
      * @return True if both pipes have the same service points, otherwise false.
-     * @complexity O(1)
      */
     bool operator==(const Pipe &secondPipe) const;
 };
